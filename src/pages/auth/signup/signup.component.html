@@ -1,0 +1,202 @@
+<div class="signup-container">
+  <div class="signup-card">
+    <div class="logo-section">
+      <div class="logo-circle">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+      </div>
+      <h1 class="signup-title">Create Your Account</h1>
+      <p class="signup-subtitle">Join us today and start your journey</p>
+    </div>
+
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="signup-form">
+      <!-- Full Name Field -->
+      <div class="form-group">
+        <label for="name" class="form-label">Full Name</label>
+        <input
+          type="text"
+          id="name"
+          formControlName="name"
+          class="form-input"
+          [class.input-error]="hasError('name')"
+          placeholder="Enter your full name"
+        />
+        <div *ngIf="hasError('name')" class="error-message">
+          <span>{{ getErrorMessage('name') }}</span>
+        </div>
+      </div>
+
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="email" class="form-label">Email Address</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-input"
+          [class.input-error]="hasError('email')"
+          placeholder="Enter your email"
+        />
+        <div *ngIf="hasError('email')" class="error-message">
+          <span>{{ getErrorMessage('email') }}</span>
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <div class="password-wrapper">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            class="form-input"
+            [class.input-error]="hasError('password')"
+            placeholder="Create a strong password"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="togglePasswordVisibility()"
+            tabindex="-1"
+          >
+            <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Password Strength Meter -->
+        <div *ngIf="f['password'].value" class="password-strength">
+          <div class="strength-bars">
+            <div class="strength-bar" [class.active]="passwordStrength.score >= 1" [style.background-color]="passwordStrength.score >= 1 ? passwordStrength.color : '#E5E7EB'"></div>
+            <div class="strength-bar" [class.active]="passwordStrength.score >= 2" [style.background-color]="passwordStrength.score >= 2 ? passwordStrength.color : '#E5E7EB'"></div>
+            <div class="strength-bar" [class.active]="passwordStrength.score >= 3" [style.background-color]="passwordStrength.score >= 3 ? passwordStrength.color : '#E5E7EB'"></div>
+            <div class="strength-bar" [class.active]="passwordStrength.score >= 4" [style.background-color]="passwordStrength.score >= 4 ? passwordStrength.color : '#E5E7EB'"></div>
+          </div>
+          <span class="strength-label" [style.color]="passwordStrength.color">{{ passwordStrength.label }}</span>
+        </div>
+
+        <!-- Password Requirements Hint -->
+        <div class="password-hint">
+          <p>Password must contain:</p>
+          <ul>
+            <li [class.met]="hasUpperCase()">
+              <svg class="check-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              At least one uppercase letter
+            </li>
+            <li [class.met]="hasLowerCase()">
+              <svg class="check-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              At least one lowercase letter
+            </li>
+            <li [class.met]="hasNumber()">
+              <svg class="check-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              At least one number
+            </li>
+            <li [class.met]="hasSpecialChar()">
+              <svg class="check-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              At least one special character
+            </li>
+            <li [class.met]="hasMinLength()">
+              <svg class="check-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Minimum 8 characters
+            </li>
+          </ul>
+        </div>
+
+        <div *ngIf="hasError('password')" class="error-message">
+          <span>{{ getErrorMessage('password') }}</span>
+        </div>
+      </div>
+
+      <!-- Confirm Password Field -->
+      <div class="form-group">
+        <label for="confirmPassword" class="form-label">Confirm Password</label>
+        <div class="password-wrapper">
+          <input
+            [type]="showConfirmPassword ? 'text' : 'password'"
+            id="confirmPassword"
+            formControlName="confirmPassword"
+            class="form-input"
+            [class.input-error]="hasError('confirmPassword') || hasPasswordMismatch()"
+            placeholder="Confirm your password"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="toggleConfirmPasswordVisibility()"
+            tabindex="-1"
+          >
+            <svg *ngIf="!showConfirmPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <svg *ngIf="showConfirmPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+          </button>
+        </div>
+        <div *ngIf="hasError('confirmPassword')" class="error-message">
+          <span>{{ getErrorMessage('confirmPassword') }}</span>
+        </div>
+        <div *ngIf="hasPasswordMismatch() && !hasError('confirmPassword')" class="error-message">
+          <span>Passwords do not match</span>
+        </div>
+      </div>
+
+      <!-- Terms and Conditions -->
+      <div class="form-group">
+        <label class="checkbox-label" [class.error-checkbox]="hasError('agreeToTerms')">
+          <input type="checkbox" formControlName="agreeToTerms" class="checkbox-input" />
+          <span>I agree to the <a href="/terms" class="link">Terms of Service</a> and <a href="/privacy" class="link">Privacy Policy</a></span>
+        </label>
+        <div *ngIf="hasError('agreeToTerms')" class="error-message">
+          <span>{{ getErrorMessage('agreeToTerms') }}</span>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="submit-btn" [disabled]="loading">
+        <span *ngIf="!loading">Create Account</span>
+        <span *ngIf="loading" class="loading-spinner">
+          <svg class="spinner" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="2" x2="12" y2="6"></line>
+            <line x1="12" y1="18" x2="12" y2="22"></line>
+            <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+            <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+            <line x1="2" y1="12" x2="6" y2="12"></line>
+            <line x1="18" y1="12" x2="22" y2="12"></line>
+            <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+            <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+          </svg>
+          Creating account...
+        </span>
+      </button>
+    </form>
+
+    <!-- Login Link -->
+    <div class="login-section">
+      <p>Already have an account? <a (click)="navigateToLogin()" class="login-link">Sign In</a></p>
+    </div>
+  </div>
+</div>
