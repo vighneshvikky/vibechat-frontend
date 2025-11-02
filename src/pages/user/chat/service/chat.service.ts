@@ -43,8 +43,12 @@ export class ChatService {
   }
 
   // Get all chats for user
-  getUserChats(userId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}?userId=${userId}`);
+  getUserChats(userId: string, search: string): Observable<any[]> {
+   let url = `${this.apiUrl}?userId=${userId}`;
+  if (search) {
+    url += `&search=${encodeURIComponent(search)}`;
+  }
+  return this.http.get<any[]>(url);
   }
 
        getChatMessages(chatId: string): Observable<any> {
@@ -70,5 +74,45 @@ export class ChatService {
   // Delete chat
   deleteChat(chatId: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${chatId}`);
+  }
+
+   uploadFile(file: File, chatId: string, senderId: string): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('chatId', chatId);
+    formData.append('senderId', senderId);
+
+    return this.http.post<any>(`${this.apiUrl}/upload`, formData);
+  }
+
+  // Helper to get file URL
+  getFileUrl(fileName: string): string {
+    return `${environment.apiUrl}/uploads/chat-files/${fileName}`;
+  }
+
+  // Helper to determine if file is image
+  isImageFile(mimeType: string): boolean {
+    return mimeType.startsWith('image/');
+  }
+
+  // Helper to get file icon
+  getFileIcon(mimeType: string): string {
+    if (mimeType.startsWith('image/')) return '🖼️';
+    if (mimeType.startsWith('video/')) return '🎥';
+    if (mimeType.startsWith('audio/')) return '🎵';
+    if (mimeType.includes('pdf')) return '📄';
+    if (mimeType.includes('word')) return '📝';
+    if (mimeType.includes('excel') || mimeType.includes('spreadsheet')) return '📊';
+    if (mimeType.includes('zip') || mimeType.includes('rar')) return '📦';
+    return '📎';
+  }
+
+  // Format file size
+  formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
   }
 }

@@ -1,7 +1,7 @@
 // web-socket-chat.service.ts
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
@@ -20,6 +20,16 @@ export class SocketService {
   private messageSentSubject = new Subject<any>();
   private messageErrorSubject = new Subject<any>();
 
+  // Group subjects
+  private newGroupSubject = new Subject<any>();
+  private groupCreatedSubject = new Subject<any>();
+  private addedToGroupSubject = new Subject<any>();
+  private userAddedToGroupSubject = new Subject<any>();
+  private userRemovedFromGroupSubject = new Subject<any>();
+
+  // Private chat subjects
+  private privateChatCreatedSubject = new Subject<any>();
+
   // Observables
   public newMessage$ = this.newMessageSubject.asObservable();
   public userTyping$ = this.userTypingSubject.asObservable();
@@ -28,17 +38,13 @@ export class SocketService {
   public messageSent$ = this.messageSentSubject.asObservable();
   public messageError$ = this.messageErrorSubject.asObservable();
 
-  private newGroupSubject = new Subject<any>();
-private groupCreatedSubject = new Subject<any>();
-private addedToGroupSubject = new Subject<any>();
-private userAddedToGroupSubject = new Subject<any>();
-private userRemovedFromGroupSubject = new Subject<any>();
-
   public newGroup$ = this.newGroupSubject.asObservable();
-public groupCreated$ = this.groupCreatedSubject.asObservable();
-public addedToGroup$ = this.addedToGroupSubject.asObservable();
-public userAddedToGroup$ = this.userAddedToGroupSubject.asObservable();
-public userRemovedFromGroup$ = this.userRemovedFromGroupSubject.asObservable();
+  public groupCreated$ = this.groupCreatedSubject.asObservable();
+  public addedToGroup$ = this.addedToGroupSubject.asObservable();
+  public userAddedToGroup$ = this.userAddedToGroupSubject.asObservable();
+  public userRemovedFromGroup$ = this.userRemovedFromGroupSubject.asObservable();
+
+  public privateChatCreated$ = this.privateChatCreatedSubject.asObservable();
 
   constructor() {}
 
@@ -59,7 +65,6 @@ public userRemovedFromGroup$ = this.userRemovedFromGroupSubject.asObservable();
       query: userId ? { userId } : {},
     });
 
-    // Set up all event listeners immediately
     this.setupEventListeners();
   }
 
@@ -102,7 +107,6 @@ public userRemovedFromGroup$ = this.userRemovedFromGroupSubject.asObservable();
       this.messageErrorSubject.next(error);
     });
 
-    // CRITICAL: Listen for new messages
     this.socket.on('newMessage', (message: any) => {
       console.log('📥 NEW MESSAGE RECEIVED FROM SERVER:', message);
       this.newMessageSubject.next(message);
@@ -113,34 +117,41 @@ public userRemovedFromGroup$ = this.userRemovedFromGroupSubject.asObservable();
       this.userTypingSubject.next(data);
     });
 
+    // Group events
     this.socket.on('newGroup', (group: any) => {
-    console.log('👥 New group received:', group);
-    this.newGroupSubject.next(group);
-  });
+      console.log('👥 New group received:', group);
+      this.newGroupSubject.next(group);
+    });
 
-  this.socket.on('groupCreated', (data: any) => {
-    console.log('✅ Group created confirmation:', data);
-    this.groupCreatedSubject.next(data);
-  });
+    this.socket.on('groupCreated', (data: any) => {
+      console.log('✅ Group created confirmation:', data);
+      this.groupCreatedSubject.next(data);
+    });
 
-  this.socket.on('addedToGroup', (group: any) => {
-    console.log('➕ Added to group:', group);
-    this.addedToGroupSubject.next(group);
-  });
+    this.socket.on('addedToGroup', (group: any) => {
+      console.log('➕ Added to group:', group);
+      this.addedToGroupSubject.next(group);
+    });
 
-  this.socket.on('userAddedToGroup', (data: any) => {
-    console.log('👤 User added to group:', data);
-    this.userAddedToGroupSubject.next(data);
-  });
+    this.socket.on('userAddedToGroup', (data: any) => {
+      console.log('👤 User added to group:', data);
+      this.userAddedToGroupSubject.next(data);
+    });
 
-  this.socket.on('userRemovedFromGroup', (data: any) => {
-    console.log('👤 User removed from group:', data);
-    this.userRemovedFromGroupSubject.next(data);
-  });
+    this.socket.on('userRemovedFromGroup', (data: any) => {
+      console.log('👤 User removed from group:', data);
+      this.userRemovedFromGroupSubject.next(data);
+    });
 
-  this.socket.on('groupError', (error: any) => {
-    console.error('❌ Group error:', error);
-  });
+    this.socket.on('groupError', (error: any) => {
+      console.error('❌ Group error:', error);
+    });
+
+    // Private chat events
+    this.socket.on('privateChatCreated', (data: any) => {
+      console.log('💬 Private chat created:', data);
+      this.privateChatCreatedSubject.next(data);
+    });
 
     console.log('✅ All socket event listeners set up');
   }
@@ -166,7 +177,8 @@ public userRemovedFromGroup$ = this.userRemovedFromGroupSubject.asObservable();
     chatId: string,
     senderId: string,
     content: string,
-    type: string = 'text'
+    type: string = 'text',
+    fileMetadata?: any
   ) {
     if (!this.socket) {
       console.error('❌ Socket not connected!');
@@ -183,15 +195,41 @@ public userRemovedFromGroup$ = this.userRemovedFromGroupSubject.asObservable();
       senderId,
       content,
       type,
+      fileMetadata,
     };
 
     console.log('📤 Socket.emit sendMessage:', messageData);
-    console.log('📍 Socket ID:', this.socket.id);
-    console.log('📍 Socket connected:', this.socket.connected);
-
     this.socket.emit('sendMessage', messageData);
-
     console.log('✅ Message emitted to server');
+  }
+
+  // Create private chat via WebSocket
+  createPrivateChat(userId1: string, userId2: string) {
+    if (!this.socket) {
+      console.error('❌ Socket not connected!');
+      return;
+    }
+
+    console.log('💬 Creating private chat:', { userId1, userId2 });
+    this.socket.emit('createPrivateChat', { userId1, userId2 });
+  }
+
+  createGroup(name: string, participants: string[], createdBy: string) {
+    if (!this.socket) return;
+    
+    this.socket.emit('createGroup', { name, participants, createdBy });
+  }
+
+  addUserToGroup(chatId: string, userId: string, addedBy: string) {
+    if (!this.socket) return;
+    
+    this.socket.emit('addUserToGroup', { chatId, userId, addedBy });
+  }
+
+  removeUserFromGroup(chatId: string, userId: string, removedBy: string) {
+    if (!this.socket) return;
+    
+    this.socket.emit('removeUserFromGroup', { chatId, userId, removedBy });
   }
 
   emitTyping(chatId: string, userId: string, username: string) {
@@ -230,34 +268,5 @@ public userRemovedFromGroup$ = this.userRemovedFromGroupSubject.asObservable();
 
   getSocketId(): string | undefined {
     return this.socket?.id;
-  }
-
-  createGroup(name: string, participants: string[], createdBy: string) {
-  if (!this.socket) return;
-  
-  this.socket.emit('createGroup', { name, participants, createdBy });
-}
-
-addUserToGroup(chatId: string, userId: string, addedBy: string) {
-  if (!this.socket) return;
-  
-  this.socket.emit('addUserToGroup', { chatId, userId, addedBy });
-}
-
-removeUserFromGroup(chatId: string, userId: string, removedBy: string) {
-  if (!this.socket) return;
-  
-  this.socket.emit('removeUserFromGroup', { chatId, userId, removedBy });
-}
-
-  // Legacy methods for backward compatibility (deprecated)
-  onNewMessage(callback: (message: any) => void) {
-    console.warn('⚠️ onNewMessage callback is deprecated, use newMessage$ observable instead');
-    this.newMessage$.subscribe(callback);
-  }
-
-  onUserTyping(callback: (data: any) => void) {
-    console.warn('⚠️ onUserTyping callback is deprecated, use userTyping$ observable instead');
-    this.userTyping$.subscribe(callback);
   }
 }

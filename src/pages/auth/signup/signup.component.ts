@@ -61,7 +61,6 @@ export class SignupComponent implements OnInit {
           ],
         ],
         confirmPassword: ['', [Validators.required]],
-        agreeToTerms: [false, [Validators.requiredTrue]],
       },
       {
         validators: this.passwordMatchValidator,
@@ -348,25 +347,18 @@ export class SignupComponent implements OnInit {
     return password && /[0-9]/.test(password);
   }
 
-  /**
-   * Check if password has special character
-   */
+
   hasSpecialChar(): boolean {
     const password = this.signupForm.get('password')?.value;
     return password && /[!@#$%^&*(),.?":{}|<>]/.test(password);
   }
 
-  /**
-   * Check if password meets minimum length
-   */
+
   hasMinLength(): boolean {
     const password = this.signupForm.get('password')?.value;
     return password && password.length >= 8;
   }
 
-  /**
-   * Check if passwords don't match
-   */
   hasPasswordMismatch(): boolean {
     return !!(
       this.signupForm.errors?.['passwordMismatch'] &&
@@ -374,9 +366,7 @@ export class SignupComponent implements OnInit {
     );
   }
 
-  /**
-   * Get error message for a field
-   */
+
   getErrorMessage(fieldName: string): string {
     const field = this.signupForm.get(fieldName);
     if (!field || !field.errors || (!field.touched && !this.submitted)) {

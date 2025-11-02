@@ -54,8 +54,9 @@ export class LoginComponent implements OnInit {
       console.log('res', res);
       this.router.navigate(['/dashboard'])
     }
+  
   })
-
+this.loading = false
   }
 
   navigateToSignup(): void {
