@@ -1,4 +1,3 @@
-// chat.component.ts (Fixed version)
 import {
   Component,
   OnInit,
@@ -30,13 +29,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('messagesContainer')
   messagesContainer!: ElementRef<HTMLDivElement>;
 
-  messageContent: string = '';
-  currentUser: any;
-  availableUsers: any[] = [];
-  messages: any[] = [];
-  chats: any[] = [];
 
-  selectedChat: any = null;
   showCreateChat: boolean = false;
   newChatType: 'private' | 'group' = 'private';
   selectedUsers: string[] = [];
@@ -44,10 +37,10 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   isLoading: boolean = false;
   searchTerm: string = '';
 
-  // Emoji picker
+ 
   showEmojiPicker: boolean = false;
 
-  // File upload
+  
   selectedFile: File | null = null;
   filePreview: string | null = null;
   uploadProgress: number = 0;
@@ -57,6 +50,14 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private isNearBottom = true;
   environmet = environment;
+
+    messageContent: string = '';
+  currentUser: any;
+  availableUsers: any[] = [];
+  messages: any[] = [];
+  chats: any[] = [];
+
+  selectedChat: any = null;
 
   private subscriptions: Subscription[] = [];
 
@@ -76,13 +77,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 
         this.socketService.connect(user._id);
 
-        // Subscribe to new messages
         this.subscriptions.push(
           this.socketService.newMessage$.subscribe((msg: any) => {
             console.log('📥 NEW MESSAGE EVENT:', msg);
 
             if (this.selectedChat && msg.chatId === this.selectedChat._id) {
-              // Handle both sender and senderId fields
+     
               const senderIdValue = this.getSenderId(msg);
 
               const newMessage = {
@@ -93,7 +93,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
               console.log('✅ Adding message to UI:', newMessage);
               this.messages.push(newMessage);
 
-              // Auto-scroll if user was near bottom or if it's their own message
+           
               if (this.isNearBottom || newMessage.self) {
                 this.scrollToBottom();
               }
@@ -103,7 +103,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
           })
         );
 
-        // Subscribe to private chat created
+       
         this.subscriptions.push(
           this.socketService.privateChatCreated$.subscribe((data: any) => {
             console.log('💬 Private chat created successfully:', data);
@@ -119,14 +119,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
           })
         );
 
-        // Subscribe to typing events
+
         this.subscriptions.push(
           this.socketService.userTyping$.subscribe((data: any) => {
             console.log('⌨️ User typing:', data);
           })
         );
 
-        // Subscribe to message errors
         this.subscriptions.push(
           this.socketService.messageError$.subscribe((error: any) => {
             console.error('❌ Message error:', error);
@@ -134,7 +133,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
           })
         );
 
-        // Subscribe to group created
+     
         this.subscriptions.push(
           this.socketService.groupCreated$.subscribe((data: any) => {
             console.log('✅ Group created successfully:', data);
@@ -149,7 +148,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
           })
         );
 
-        // Subscribe to new group notifications
+     
         this.subscriptions.push(
           this.socketService.newGroup$.subscribe((group: any) => {
             console.log('👥 New group notification:', group);
@@ -157,10 +156,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
           })
         );
 
-        // Subscribe to added to group
+      
         this.subscriptions.push(
           this.socketService.addedToGroup$.subscribe((group: any) => {
-            console.log('➕ Added to group:', group);
             this.loadChats();
           })
         );
@@ -174,7 +172,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  // Helper method to get sender ID from message (handles both sender and senderId)
+
   private getSenderId(msg: any): string {
     if (msg.sender) {
       return typeof msg.sender === 'object' ? msg.sender._id : msg.sender;
@@ -234,7 +232,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.isLoading = true;
 
-    // Use WebSocket to create private chat in real-time
     this.socketService.createPrivateChat(this.currentUser._id, user._id);
   }
 
@@ -268,7 +265,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   loadMessages(chatId: string) {
     this.chatService.getChatMessages(chatId).subscribe({
       next: (res) => {
-        // Handle both sender and senderId fields from API response
+   
         this.messages = res.map((msg: any) => {
           const senderIdValue = this.getSenderId(msg);
           return {
@@ -277,7 +274,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
           };
         });
         console.log('Loaded messages:', this.messages);
-        // Scroll to bottom after messages are loaded
+     
         setTimeout(() => this.scrollToBottom(), 100);
       },
       error: (error) => {
@@ -369,14 +366,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
         next: (response) => {
           console.log('✅ File uploaded:', response);
 
-          // Send file message with metadata via socket
-          this.socketService.sendMessage(
-            this.selectedChat._id,
-            this.currentUser._id,
-            response.message.content,
-            response.message.type,
-            response.message.fileMetadata
-          );
+
+                const newMessage = {
+          ...response.message,
+          self: true,
+        };
+
+        this.messages.push(newMessage);
 
           this.selectedFile = null;
           this.filePreview = null;

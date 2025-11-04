@@ -29,7 +29,7 @@ export class ChatService {
     return this.http.post(`${this.apiUrl}/private`, {
       userId,
       participantId
-    });
+    }, {withCredentials: true});
   }
 
   // Create group chat
@@ -39,7 +39,7 @@ export class ChatService {
       name,
       members,
       userId
-    });
+    }, {withCredentials: true});
   }
 
   // Get all chats for user
@@ -48,32 +48,32 @@ export class ChatService {
   if (search) {
     url += `&search=${encodeURIComponent(search)}`;
   }
-  return this.http.get<any[]>(url);
+  return this.http.get<any[]>(url, {withCredentials: true});
   }
 
        getChatMessages(chatId: string): Observable<any> {
         console.log('loading chate ee message');
-    return this.http.get<any>(`${this.apiUrl}/getChatMessages/${chatId}`);
+    return this.http.get<any>(`${this.apiUrl}/getChatMessages/${chatId}`, {withCredentials: true});
   }
 
   // Get single chat
   getChat(chatId: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${chatId}`);
+    return this.http.get<any>(`${this.apiUrl}/${chatId}`, {withCredentials: true});
   }
 
   // Join group chat
   joinChat(chatId: string, userId: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${chatId}/join`, { userId });
+    return this.http.post(`${this.apiUrl}/${chatId}/join`, { userId }, {withCredentials: true});
   }
 
   // Leave group chat
   leaveChat(chatId: string, userId: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${chatId}/leave`, { userId });
+    return this.http.post(`${this.apiUrl}/${chatId}/leave`, { userId }, {withCredentials: true});
   }
 
   // Delete chat
   deleteChat(chatId: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${chatId}`);
+    return this.http.delete(`${this.apiUrl}/${chatId}`, {withCredentials: true});
   }
 
    uploadFile(file: File, chatId: string, senderId: string): Observable<any> {
@@ -82,7 +82,7 @@ export class ChatService {
     formData.append('chatId', chatId);
     formData.append('senderId', senderId);
 
-    return this.http.post<any>(`${this.apiUrl}/upload`, formData);
+    return this.http.post<any>(`${this.apiUrl}/upload`, formData, {withCredentials: true});
   }
 
   // Helper to get file URL

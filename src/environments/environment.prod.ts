@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://yourdomain.com/api',
-  socketUrl: 'https://yourdomain.com',
+  apiUrl: 'https://api.vortex-fit.space',
+  socketUrl: 'https://api.vortex-fit.space',
   googleClientId: 'your-prod-google-client-id',
 
 };

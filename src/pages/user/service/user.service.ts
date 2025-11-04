@@ -13,10 +13,14 @@ export class UserService {
   constructor(private http: HttpClient) {}
 
   listAllUser(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.api}/users/all`);
+    return this.http.get<any[]>(`${this.api}/users/all`, {
+      withCredentials: true,
+    });
   }
 
   getCurrentUser(): Observable<User> {
-    return this.http.get<User>(`${this.api}/users/userDetails`);
+    return this.http.get<User>(`${this.api}/users/userDetails`, {
+      withCredentials: true,
+    });
   }
 }

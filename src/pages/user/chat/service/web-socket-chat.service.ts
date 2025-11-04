@@ -1,4 +1,4 @@
-// web-socket-chat.service.ts
+
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject, Subject } from 'rxjs';
@@ -203,7 +203,7 @@ export class SocketService {
     console.log('✅ Message emitted to server');
   }
 
-  // Create private chat via WebSocket
+
   createPrivateChat(userId1: string, userId2: string) {
     if (!this.socket) {
       console.error('❌ Socket not connected!');

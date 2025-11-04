@@ -67,12 +67,12 @@ export class SignupComponent implements OnInit {
       }
     );
 
-    // Watch password changes for strength meter
+   
     this.signupForm.get('password')?.valueChanges.subscribe((password) => {
       this.calculatePasswordStrength(password || '');
     });
 
-    // Revalidate confirmPassword when password changes
+ 
     this.signupForm.get('password')?.valueChanges.subscribe(() => {
       this.signupForm.get('confirmPassword')?.updateValueAndValidity();
     });
@@ -82,10 +82,6 @@ export class SignupComponent implements OnInit {
     return this.signupForm.controls;
   }
 
-  /**
-   * Custom validator for full name
-   * Ensures name contains only letters, spaces, hyphens, and apostrophes
-   */
   nameValidator(control: AbstractControl): ValidationErrors | null {
     if (!control.value) return null;
 
@@ -96,7 +92,7 @@ export class SignupComponent implements OnInit {
       return { invalidName: true };
     }
 
-    // Check for at least one letter
+
     const hasLetter = /[a-zA-Z]/.test(control.value);
     if (!hasLetter) {
       return { invalidName: true };
@@ -105,10 +101,6 @@ export class SignupComponent implements OnInit {
     return null;
   }
 
-  /**
-   * Enhanced email validator
-   * Validates email format more strictly than the built-in validator
-   */
   emailValidator(control: AbstractControl): ValidationErrors | null {
     if (!control.value) return null;
 
@@ -119,15 +111,15 @@ export class SignupComponent implements OnInit {
       return { invalidEmail: true };
     }
 
-    // Additional checks
+ 
     const value = control.value.trim();
 
-    // Check for consecutive dots
+ 
     if (value.includes('..')) {
       return { invalidEmail: true };
     }
 
-    // Check if starts or ends with special characters
+
     if (/^[._%+-]|[._%+-]$/.test(value.split('@')[0])) {
       return { invalidEmail: true };
     }
@@ -135,43 +127,37 @@ export class SignupComponent implements OnInit {
     return null;
   }
 
-  /**
-   * Password strength validator
-   * Requires uppercase, lowercase, number, and special character
-   */
   passwordValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.value;
     if (!password) return null;
 
     const errors: ValidationErrors = {};
 
-    // Check for uppercase letter
     if (!/[A-Z]/.test(password)) {
       errors['noUpperCase'] = true;
     }
 
-    // Check for lowercase letter
+   
     if (!/[a-z]/.test(password)) {
       errors['noLowerCase'] = true;
     }
 
-    // Check for number
+    
     if (!/[0-9]/.test(password)) {
       errors['noNumber'] = true;
     }
 
-    // Check for special character
+
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
       errors['noSpecialChar'] = true;
     }
 
-    // Check for common weak patterns
+  
     const commonPasswords = ['password', '12345678', 'qwerty', 'abc123'];
     if (commonPasswords.some((weak) => password.toLowerCase().includes(weak))) {
       errors['commonPassword'] = true;
     }
 
-    // Check for sequential characters
     if (/(.)\1{2,}/.test(password)) {
       errors['repeatingChars'] = true;
     }
@@ -179,15 +165,11 @@ export class SignupComponent implements OnInit {
     return Object.keys(errors).length > 0 ? errors : null;
   }
 
-  /**
-   * Password match validator
-   * Ensures password and confirmPassword fields match
-   */
+
   passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
     const password = group.get('password')?.value;
     const confirmPassword = group.get('confirmPassword')?.value;
 
-    // Only validate if both fields have values
     if (!password || !confirmPassword) {
       return null;
     }
@@ -195,9 +177,7 @@ export class SignupComponent implements OnInit {
     return password === confirmPassword ? null : { passwordMismatch: true };
   }
 
-  /**
-   * Calculate password strength score
-   */
+
   calculatePasswordStrength(password: string): void {
     if (!password) {
       this.passwordStrength = { score: 0, label: '', color: '' };
@@ -206,18 +186,16 @@ export class SignupComponent implements OnInit {
 
     let score = 0;
 
-    // Length scoring
     if (password.length >= 8) score++;
     if (password.length >= 12) score++;
     if (password.length >= 16) score++;
 
-    // Character variety scoring
+   
     if (/[a-z]/.test(password)) score++;
     if (/[A-Z]/.test(password)) score++;
     if (/[0-9]/.test(password)) score++;
     if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) score++;
 
-    // Bonus for mixing character types
     const hasMultipleTypes =
       [
         /[a-z]/.test(password),
@@ -228,7 +206,6 @@ export class SignupComponent implements OnInit {
 
     if (hasMultipleTypes) score++;
 
-    // Penalty for common patterns
     if (/(.)\1{2,}/.test(password)) score = Math.max(0, score - 1);
 
     const commonPasswords = ['password', '12345678', 'qwerty', 'abc123'];
@@ -236,10 +213,9 @@ export class SignupComponent implements OnInit {
       score = Math.max(0, score - 2);
     }
 
-    // Normalize score to 1-4 range
+
     const normalizedScore = Math.min(4, Math.max(1, Math.ceil(score / 2)));
 
-    // Set strength based on normalized score
     switch (normalizedScore) {
       case 1:
         this.passwordStrength = { score: 1, label: 'Weak', color: '#DC2626' };
@@ -292,9 +268,7 @@ export class SignupComponent implements OnInit {
     });
   }
 
-  /**
-   * Helper method to get all form validation errors (for debugging)
-   */
+
   getFormValidationErrors(): any[] {
     const errors: any[] = [];
     Object.keys(this.signupForm.controls).forEach((key) => {
