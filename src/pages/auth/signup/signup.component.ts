@@ -10,12 +10,13 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../service/auth.service';
+import { GradientButtonComponent } from '../../../core/shared/buttons/gradient-button.component';
 
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.scss'],
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, GradientButtonComponent],
 })
 export class SignupComponent implements OnInit {
   signupForm!: FormGroup;

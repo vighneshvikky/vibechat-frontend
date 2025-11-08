@@ -16,12 +16,13 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { EmojiPickerComponent } from '../emoji/emoji-picker.component';
 import { MessageFormatterService } from './service/messageFormat.service';
 import { environment } from '../../../environments/environment';
+import { NotificationModalComponent } from '../../../core/shared/modals/notification-modal.component';
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss'],
-  imports: [FormsModule, CommonModule, EmojiPickerComponent],
+  imports: [FormsModule, CommonModule, EmojiPickerComponent, NotificationModalComponent],
 })
 export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -35,7 +36,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   groupChatName: string = '';
   isLoading: boolean = false;
   searchTerm: string = '';
-   isRemovedFromGroup: boolean = false;
+  isRemovedFromGroup: boolean = false;
 
   showEmojiPicker: boolean = false;
 
@@ -62,6 +63,15 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 
   selectedChat: any = null;
 
+  modalVisible: boolean = false;
+  modalTitle: string = '';
+  modalMessage: string = '';
+  modalSubMessage: string = '';
+  modalType: 'info' | 'success' | 'warning' | 'error' = 'info';
+  modalShowCancel: boolean = false;
+  modalConfirmText: string = 'OK';
+  modalAction: (() => void) | null = null;
+
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -84,6 +94,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
           this.socketService.newMessage$.subscribe((msg: any) => {
             console.log('📥 NEW MESSAGE EVENT:', msg);
 
+            this.moveChatToTop(msg.chatId);
+
             if (this.selectedChat && msg.chatId === this.selectedChat._id) {
               const senderIdValue = this.getSenderId(msg);
 
@@ -100,6 +112,22 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
                   this.scrollToBottom();
                 }
               }, 100);
+            } else {
+              if (msg.type !== 'system') {
+                const senderName = msg.sender?.name || 'Someone';
+                const chatName =
+                  this.chats.find((c) => c._id === msg.chatId)?.name ||
+                  'a chat';
+
+                this.showModal(
+                  'New Message',
+                  `${senderName} sent a message in ${chatName}`,
+                  'info',
+                  msg.type === 'text'
+                    ? msg.content.substring(0, 50) + '...'
+                    : 'New file'
+                );
+              }
             }
 
             this.loadChats();
@@ -161,7 +189,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
           })
         );
 
-         this.subscriptions.push(
+        this.subscriptions.push(
           this.socketService.userAddedToGroup$.subscribe((data: any) => {
             console.log('➕ User added to group event:', data);
             if (this.selectedChat && data.chatId === this.selectedChat._id) {
@@ -184,53 +212,58 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
         );
 
         this.subscriptions.push(
-  this.socketService.userRemovedFromGroup$.subscribe((data: any) => {
-    console.log('➖ User removed from group event:', data);
-    if (this.selectedChat && data.chatId === this.selectedChat._id) {
-      this.selectedChat = data.group;
-      this.checkIfAdmin();
-      
-      // Check if current user was removed
-      const memberIds = (data.group.members || []).map((m: any) => 
-        typeof m === 'object' ? m._id : m
-      );
-      
-      if (!memberIds.includes(this.currentUser._id)) {
-        this.isRemovedFromGroup = true;
-      }
-    }
-    this.loadChats();
-  })
-);
+          this.socketService.userRemovedFromGroup$.subscribe((data: any) => {
+            console.log('➖ User removed from group event:', data);
+            if (this.selectedChat && data.chatId === this.selectedChat._id) {
+              this.selectedChat = data.group;
+              this.checkIfAdmin();
 
-// Add subscription for when current user is specifically notified of removal
-this.subscriptions.push(
-  this.socketService.removedFromGroup$.subscribe((data: any) => {
-    console.log('🚫 You were removed from group:', data);
-    
-    if (this.selectedChat && data.chatId === this.selectedChat._id) {
-      this.isRemovedFromGroup = true;
-      this.messageContent = '';
-      
-      // Show alert to user
-      const message = data.isKicked 
-        ? `You have been removed from "${data.groupName}"`
-        : `You have left "${data.groupName}"`;
-      
-      alert(message);
-      
-      // Clear the selected chat after a delay
-      setTimeout(() => {
-        this.selectedChat = null;
-        this.messages = [];
-        this.showGroupDetails = false;
-        this.isRemovedFromGroup = false;
-      }, 2000);
-    }
-    
-    this.loadChats(); // Refresh chat list
-  })
-);
+             
+              const memberIds = (data.group.members || []).map((m: any) =>
+                typeof m === 'object' ? m._id : m
+              );
+
+              if (!memberIds.includes(this.currentUser._id)) {
+                this.isRemovedFromGroup = true;
+              }
+            }
+            this.loadChats();
+          })
+        );
+
+
+        this.subscriptions.push(
+          this.socketService.removedFromGroup$.subscribe((data: any) => {
+            console.log('🚫 You were removed from group:', data);
+
+            if (this.selectedChat && data.chatId === this.selectedChat._id) {
+              this.isRemovedFromGroup = true;
+              this.messageContent = '';
+
+              // Show alert to user
+              const message = data.isKicked
+                ? `You have been removed from "${data.groupName}"`
+                : `You have left "${data.groupName}"`;
+
+   this.showModal(
+        data.isKicked ? 'Removed from Group' : 'Left Group',
+        message,
+        'warning',
+        'You will no longer receive messages from this group',
+        false,
+        'OK',
+        () => {
+          this.selectedChat = null;
+          this.messages = [];
+          this.showGroupDetails = false;
+          this.isRemovedFromGroup = false;
+        }
+      );
+            }
+
+            this.loadChats(); // Refresh chat list
+          })
+        );
 
         this.loadUsers();
         this.loadChats();
@@ -251,20 +284,80 @@ this.subscriptions.push(
     return '';
   }
 
-  
+  moveChatToTop(chatId: string): void {
+    const chatIndex = this.chats.findIndex((c) => c._id === chatId);
+    if (chatIndex > 0) {
+      const [chat] = this.chats.splice(chatIndex, 1);
+      this.chats.unshift(chat);
+    }
+  }
+
+  getLastMessagePreview(chat: any): string {
+    if (!chat.lastMessage) return 'No messages yet';
+
+    const lastMsg = chat.lastMessage;
+
+    console.log('lastMsg', lastMsg);
+
+    if (lastMsg.type === 'system') {
+      return lastMsg.content;
+    }
+
+    if (lastMsg.type === 'text') {
+      return lastMsg.content.length > 40
+        ? lastMsg.content.substring(0, 40) + '...'
+        : lastMsg.content;
+    }
+
+    if (lastMsg.type === 'image') return '📷 Image';
+    if (lastMsg.type === 'video') return '🎥 Video';
+    if (lastMsg.type === 'audio') return '🎵 Audio';
+    if (lastMsg.type === 'file') return '📎 File';
+
+    return 'New message';
+  }
 
   onSearchChange(): void {
     this.loadChats();
   }
 
   ngAfterViewInit() {
-    
     if (this.messagesContainer) {
       console.log('✅ Messages container initialized');
     }
   }
 
-  
+  showModal(
+    title: string,
+    message: string,
+    type: 'info' | 'success' | 'warning' | 'error' = 'info',
+    subMessage: string = '',
+    showCancel: boolean = false,
+    confirmText: string = 'OK',
+    action: (() => void) | null = null
+  ): void {
+    this.modalTitle = title;
+    this.modalMessage = message;
+    this.modalSubMessage = subMessage;
+    this.modalType = type;
+    this.modalShowCancel = showCancel;
+    this.modalConfirmText = confirmText;
+    this.modalAction = action;
+    this.modalVisible = true;
+  }
+
+  onModalConfirm(): void {
+    if (this.modalAction) {
+      this.modalAction();
+    }
+    this.modalVisible = false;
+  }
+
+  onModalCancel(): void {
+    this.modalVisible = false;
+    this.modalAction = null;
+  }
+
   handleEnter(event: Event) {
     const e = event as KeyboardEvent;
     if (e.shiftKey) return;
@@ -278,17 +371,15 @@ this.subscriptions.push(
       return;
     }
 
-    
-    
-    
     const members = this.selectedChat.members || [];
-    this.isGroupAdmin = members.length > 0 && 
+    this.isGroupAdmin =
+      members.length > 0 &&
       this.getMemberId(members[0]) === this.currentUser._id;
   }
 
   isSystemMessage(message: any): boolean {
-  return message.type === 'system';
-}
+    return message.type === 'system';
+  }
 
   loadUsers(): void {
     this.userService.listAllUser().subscribe({
@@ -303,7 +394,7 @@ this.subscriptions.push(
     });
   }
 
-    getMemberId(member: any): string {
+  getMemberId(member: any): string {
     return typeof member === 'object' ? member._id : member;
   }
 
@@ -311,15 +402,14 @@ this.subscriptions.push(
     return typeof member === 'object' ? member.name : 'Unknown';
   }
 
-  
   getMemberEmail(member: any): string {
     return typeof member === 'object' ? member.email : '';
   }
 
-   loadAvailableUsersForGroup() {
+  loadAvailableUsersForGroup() {
     if (!this.selectedChat || !this.selectedChat.isGroup) return;
 
-    const currentMemberIds = (this.selectedChat.members || []).map((m: any) => 
+    const currentMemberIds = (this.selectedChat.members || []).map((m: any) =>
       this.getMemberId(m)
     );
 
@@ -356,7 +446,12 @@ this.subscriptions.push(
   removeUserFromGroup(userId: string) {
     if (!this.selectedChat || !this.isGroupAdmin) return;
     if (userId === this.currentUser._id) {
-      alert('You cannot remove yourself as admin');
+          this.showModal(
+      'Cannot Remove Self',
+      'You cannot remove yourself as admin',
+      'warning',
+      'Please transfer admin rights to another member first'
+    );
       return;
     }
 
@@ -365,24 +460,45 @@ this.subscriptions.push(
     );
     const name = this.getMemberName(memberName);
 
-    if (confirm(`Remove ${name} from the group?`)) {
+  this.showModal(
+    'Remove Member',
+    `Are you sure you want to remove ${name} from the group?`,
+    'warning',
+    'This action cannot be undone',
+    true,
+    'Remove',
+    () => {
       this.socketService.removeUserFromGroup(
         this.selectedChat._id,
         userId,
         this.currentUser._id
       );
     }
+  );
+
   }
 
-  // Leave group (for non-admin members)
+ 
   leaveGroup() {
     if (!this.selectedChat || !this.selectedChat.isGroup) return;
     if (this.isGroupAdmin) {
-      alert('As admin, you cannot leave the group. Please transfer admin rights first.');
+   this.showModal(
+      'Cannot Leave Group',
+      'As admin, you cannot leave the group',
+      'warning',
+      'Please transfer admin rights to another member first'
+    );
       return;
     }
 
-    if (confirm('Are you sure you want to leave this group?')) {
+ this.showModal(
+    'Leave Group',
+    `Are you sure you want to leave "${this.selectedChat.name}"?`,
+    'warning',
+    'You will need to be re-added by an admin to rejoin',
+    true,
+    'Leave',
+    () => {
       this.socketService.removeUserFromGroup(
         this.selectedChat._id,
         this.currentUser._id,
@@ -391,15 +507,12 @@ this.subscriptions.push(
       this.selectedChat = null;
       this.showGroupDetails = false;
     }
+  );
   }
 
-  // Get member count
   getMemberCount(): number {
     return this.selectedChat?.members?.length || 0;
   }
-
-
-
 
   loadChats(): void {
     if (!this.currentUser) return;
@@ -426,7 +539,11 @@ this.subscriptions.push(
 
   createGroupChat() {
     if (!this.groupChatName || this.selectedUsers.length === 0) {
-      alert('Please enter a group name and select at least one member');
+          this.showModal(
+      'Invalid Input',
+      'Please enter a group name and select at least one member',
+      'warning'
+    );
       return;
     }
 
@@ -442,6 +559,18 @@ this.subscriptions.push(
 
     this.groupChatName = '';
     this.selectedUsers = [];
+
+    this.subscriptions.push(
+  this.socketService.messageError$.subscribe((error: any) => {
+    console.error('❌ Message error:', error);
+    this.showModal(
+      'Message Error',
+      'Failed to send message',
+      'error',
+      error.message || 'Please try again'
+    );
+  })
+);
   }
 
   selectExistingChat(chat: any) {
@@ -515,7 +644,7 @@ this.subscriptions.push(
     this.fileInput.nativeElement.click();
   }
 
-    toggleGroupDetails() {
+  toggleGroupDetails() {
     if (!this.selectedChat) return;
     this.showGroupDetails = !this.showGroupDetails;
     if (this.showGroupDetails) {
@@ -523,8 +652,6 @@ this.subscriptions.push(
       this.loadAvailableUsersForGroup();
     }
   }
-
-  
 
   onFileSelected(event: any) {
     const file = event.target.files[0];
@@ -578,7 +705,12 @@ this.subscriptions.push(
         },
         error: (error) => {
           console.error('❌ File upload error:', error);
-          alert('Failed to upload file: ' + error.message);
+             this.showModal(
+          'Upload Failed',
+          'Failed to upload file',
+          'error',
+          error.message || 'Please try again with a smaller file'
+        );
           this.isUploading = false;
           this.uploadProgress = 0;
         },
