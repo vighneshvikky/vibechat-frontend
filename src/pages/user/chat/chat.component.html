@@ -1,17 +1,33 @@
 <!-- chat.component.html -->
-<div class="h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex flex-col">
+<div
+  class="h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex flex-col"
+>
   <!-- Header -->
   <header class="bg-white shadow-sm border-b border-purple-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-3">
-          <div class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl p-2 shadow-lg">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          <div
+            class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl p-2 shadow-lg"
+          >
+            <svg
+              class="w-8 h-8 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              ></path>
             </svg>
           </div>
           <div>
-            <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <h1
+              class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
+            >
               VibeChat
             </h1>
             <p class="text-xs text-gray-500">Connect & Communicate</p>
@@ -21,14 +37,20 @@
         <!-- User Profile -->
         <div class="flex items-center space-x-3" *ngIf="currentUser">
           <div class="text-right hidden sm:block">
-            <p class="text-sm font-semibold text-gray-800">{{ currentUser.username }}</p>
+            <p class="text-sm font-semibold text-gray-800">
+              {{ currentUser.name }}
+            </p>
             <p class="text-xs text-gray-500">{{ currentUser.email }}</p>
           </div>
           <div class="relative">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white font-bold shadow-lg ring-2 ring-white">
+            <div
+              class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white font-bold shadow-lg ring-2 ring-white"
+            >
               {{ currentUser.name?.charAt(0).toUpperCase() }}
             </div>
-            <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+            <div
+              class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"
+            ></div>
           </div>
         </div>
       </div>
@@ -39,20 +61,51 @@
   <div class="flex-1 flex overflow-hidden max-w-7xl mx-auto w-full">
     <!-- Sidebar -->
     <div class="w-80 bg-white border-r border-gray-200 flex flex-col shadow-lg">
-      <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-pink-50">
+      <div
+        class="p-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-pink-50"
+      >
         <div class="flex items-center justify-between mb-3">
           <h2 class="text-lg font-bold text-gray-800">Conversations</h2>
-          <button (click)="showCreateChat = true" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg p-2 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          <button
+            (click)="showCreateChat = true"
+            class="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg p-2 hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              ></path>
             </svg>
           </button>
         </div>
 
         <div class="relative">
-          <input type="text" placeholder="Search chats..." [(ngModel)]="searchTerm" (input)="onSearchChange()" class="w-full px-4 py-2 pl-10 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" />
-          <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          <input
+            type="text"
+            placeholder="Search chats..."
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+            class="w-full px-4 py-2 pl-10 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+          />
+          <svg
+            class="w-5 h-5 text-gray-400 absolute left-3 top-2.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            ></path>
           </svg>
         </div>
       </div>
@@ -60,16 +113,32 @@
       <!-- Chats List with Scroll -->
       <div class="flex-1 overflow-y-auto">
         <div class="p-2">
-          <div *ngFor="let chat of chats" (click)="selectExistingChat(chat)" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 cursor-pointer transition-all duration-200 mb-1" [class.bg-gradient-to-r]="selectedChat?._id === chat._id" [class.from-purple-100]="selectedChat?._id === chat._id" [class.to-pink-100]="selectedChat?._id === chat._id">
+          <div
+            *ngFor="let chat of chats"
+            (click)="selectExistingChat(chat)"
+            class="flex items-center space-x-3 p-3 rounded-xl hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 cursor-pointer transition-all duration-200 mb-1"
+            [class.bg-gradient-to-r]="selectedChat?._id === chat._id"
+            [class.from-purple-100]="selectedChat?._id === chat._id"
+            [class.to-pink-100]="selectedChat?._id === chat._id"
+          >
             <div class="relative flex-shrink-0">
-              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center text-white font-bold shadow-md">
+              <div
+                class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center text-white font-bold shadow-md"
+              >
                 {{ getChatAvatar(chat) }}
               </div>
-              <div *ngIf="!chat.isGroup" class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+              <div
+                *ngIf="!chat.isGroup"
+                class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"
+              ></div>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-semibold text-gray-800 truncate">{{ getChatDisplayName(chat) }}</p>
-              <p class="text-xs text-gray-500 truncate">{{ chat.isGroup ? "Group Chat" : "Private Chat" }}</p>
+              <p class="text-sm font-semibold text-gray-800 truncate">
+                {{ getChatDisplayName(chat) }}
+              </p>
+              <p class="text-xs text-gray-500 truncate">
+                {{ chat.isGroup ? "Group Chat" : "Private Chat" }}
+              </p>
             </div>
           </div>
         </div>
@@ -79,14 +148,31 @@
     <!-- Chat Area -->
     <div class="flex-1 flex flex-col bg-white">
       <!-- No Chat Selected -->
-      <div *ngIf="!selectedChat" class="flex-1 flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+      <div
+        *ngIf="!selectedChat"
+        class="flex-1 flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50"
+      >
         <div class="text-center">
-          <div class="bg-gradient-to-br from-purple-400 to-pink-400 rounded-full p-8 inline-block mb-4 shadow-2xl animate-pulse">
-            <svg class="w-24 h-24 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          <div
+            class="bg-gradient-to-br from-purple-400 to-pink-400 rounded-full p-8 inline-block mb-4 shadow-2xl animate-pulse"
+          >
+            <svg
+              class="w-24 h-24 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              ></path>
             </svg>
           </div>
-          <h3 class="text-2xl font-bold text-gray-700 mb-2">Welcome to VibeChat</h3>
+          <h3 class="text-2xl font-bold text-gray-700 mb-2">
+            Welcome to VibeChat
+          </h3>
           <p class="text-gray-500">Select a conversation to start chatting</p>
         </div>
       </div>
@@ -94,169 +180,663 @@
       <!-- Chat Selected -->
       <div *ngIf="selectedChat" class="flex-1 flex flex-col overflow-hidden">
         <!-- Chat Header -->
-        <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-4 shadow-lg flex-shrink-0">
+        <div
+          class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-4 shadow-lg flex-shrink-0 cursor-pointer hover:from-purple-600 hover:to-pink-600 transition-all"
+          (click)="toggleGroupDetails()"
+        >
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center font-bold shadow-lg">
+              <div
+                class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center font-bold shadow-lg"
+              >
                 {{ getChatAvatar(selectedChat) }}
               </div>
               <div>
-                <h3 class="font-bold text-lg">{{ getChatDisplayName(selectedChat) }}</h3>
-                <!-- <p class="text-xs text-purple-100">{{ selectedChat.isGroup ? "Group Chat" : "Online" }}</p> -->
+                <h3 class="font-bold text-lg">
+                  {{ getChatDisplayName(selectedChat) }}
+                </h3>
+                <p class="text-xs text-purple-100" *ngIf="selectedChat.isGroup">
+                  {{ getMemberCount() }} members · Click for details
+                </p>
+                <p
+                  class="text-xs text-purple-100"
+                  *ngIf="!selectedChat.isGroup"
+                >
+                  Private Chat
+                </p>
               </div>
+            </div>
+
+            <!-- Indicator for group details -->
+            <div *ngIf="selectedChat.isGroup" class="text-white/80">
+              <svg
+                class="w-5 h-5 transition-transform"
+                [class.rotate-180]="showGroupDetails"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Group Details Panel -->
+        <div
+          *ngIf="showGroupDetails && selectedChat?.isGroup"
+          class="bg-white border-b shadow-lg p-6 flex-shrink-0 animate-slideDown"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <h4 class="text-lg font-semibold text-gray-800">Group Members</h4>
+            <button
+              *ngIf="isGroupAdmin"
+              (click)="openAddMemberModal()"
+              class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              Add Member
+            </button>
+          </div>
+
+          <!-- Members List -->
+          <div class="space-y-2 max-h-64 overflow-y-auto">
+            <div
+              *ngFor="let member of selectedChat.members; let i = index"
+              class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <div class="flex items-center space-x-3">
+                <div
+                  class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center text-white font-semibold shadow"
+                >
+                  {{ getMemberName(member).charAt(0).toUpperCase() }}
+                </div>
+                <div>
+                  <p class="font-medium text-gray-800 flex items-center gap-2">
+                    {{ getMemberName(member) }}
+                    <span
+                      *ngIf="i === 0"
+                      class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full font-semibold"
+                    >
+                      Admin
+                    </span>
+                    <span
+                      *ngIf="getMemberId(member) === currentUser._id"
+                      class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-semibold"
+                    >
+                      You
+                    </span>
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    {{ getMemberEmail(member) }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Remove button (only for admin, can't remove self) -->
+              <button
+                *ngIf="isGroupAdmin && getMemberId(member) !== currentUser._id"
+                (click)="removeUserFromGroup(getMemberId(member))"
+                class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors"
+                title="Remove member"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Leave Group Button (for non-admin members) -->
+          <button
+            *ngIf="!isGroupAdmin"
+            (click)="leaveGroup()"
+            class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+          >
+            Leave Group
+          </button>
+        </div>
+
+        <div
+          *ngIf="isRemovedFromGroup"
+          class="bg-red-50 border-l-4 border-red-500 p-4 flex-shrink-0"
+        >
+          <div class="flex items-center">
+            <svg
+              class="w-5 h-5 text-red-500 mr-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+            <p class="text-red-800 font-medium">
+              You are no longer a member of this group
+            </p>
+          </div>
+        </div>
+
+        <!-- Add Member Modal -->
+        <div
+          *ngIf="showAddMemberModal"
+          class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          (click)="closeAddMemberModal()"
+        >
+          <div
+            class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4"
+            (click)="$event.stopPropagation()"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-800">Add Member</h3>
+              <button
+                (click)="closeAddMemberModal()"
+                class="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg
+                  class="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Available Users List -->
+            <div class="space-y-2 max-h-96 overflow-y-auto">
+              <div
+                *ngIf="availableUsersForGroup.length === 0"
+                class="text-center py-8 text-gray-500"
+              >
+                No users available to add
+              </div>
+
+              <button
+                *ngFor="let user of availableUsersForGroup"
+                (click)="addUserToGroup(user._id)"
+                class="w-full flex items-center space-x-3 p-3 bg-gray-50 hover:bg-purple-50 rounded-lg transition-colors text-left"
+              >
+                <div
+                  class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center text-white font-semibold shadow"
+                >
+                  {{ user.name.charAt(0).toUpperCase() }}
+                </div>
+                <div>
+                  <p class="font-medium text-gray-800">{{ user.name }}</p>
+                  <p class="text-sm text-gray-500">{{ user.email }}</p>
+                </div>
+              </button>
             </div>
           </div>
         </div>
 
         <!-- Messages Area with Scroll -->
-        <div #messagesContainer (scroll)="onScroll()" class="flex-1 overflow-y-auto p-6 bg-gradient-to-br from-purple-50/30 via-pink-50/30 to-blue-50/30">
-          <div class="space-y-4">
-            <!-- Date Divider -->
-            <div class="flex items-center justify-center my-4">
-              <div class="bg-white px-4 py-1 rounded-full text-xs text-gray-500 shadow-sm">Today</div>
+        <!-- Replace your messages display section with this -->
+
+        <div
+          #messagesContainer
+          (scroll)="onScroll()"
+          class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50"
+        >
+          <!-- No messages placeholder -->
+          <div
+            *ngIf="messages.length === 0"
+            class="flex items-center justify-center h-full text-gray-500"
+          >
+            <div class="text-center">
+              <svg
+                class="w-16 h-16 mx-auto mb-4 text-gray-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
+              </svg>
+              <p class="text-lg font-medium">No messages yet</p>
+              <p class="text-sm">Start the conversation!</p>
+            </div>
+          </div>
+
+          <!-- Messages -->
+          <div *ngFor="let msg of messages" class="animate-fadeIn">
+            <!-- System Message (centered) -->
+            <div *ngIf="isSystemMessage(msg)" class="flex justify-center my-4">
+              <div
+                class="bg-gray-200 text-gray-700 text-sm px-4 py-2 rounded-full shadow-sm max-w-md text-center"
+              >
+                <svg
+                  class="w-4 h-4 inline-block mr-2 -mt-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                {{ msg.content }}
+              </div>
             </div>
 
-            <!-- Message Bubbles -->
-            <div *ngFor="let msg of messages" [class.flex-row-reverse]="msg.self" class="flex items-end space-x-2">
-              <!-- Avatar for received messages -->
-              <div *ngIf="!msg.self" class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center text-white text-xs font-bold shadow-md flex-shrink-0">
-                {{ (msg.sender?.name || msg.senderId?.name)?.charAt(0).toUpperCase() || "U" }}
-              </div>
-
-              <!-- Message Content -->
-              <div class="max-w-xs lg:max-w-md">
-                <!-- Text Message -->
-                <div *ngIf="msg.type === 'text'" [class.bg-gradient-to-br]="msg.self" [class.from-purple-500]="msg.self" [class.to-pink-500]="msg.self" [class.text-white]="msg.self" [class.bg-white]="!msg.self" [class.text-gray-800]="!msg.self" class="px-4 py-3 rounded-2xl shadow-md transition-all duration-300 hover:shadow-lg" [class.rounded-br-sm]="msg.self" [class.rounded-bl-sm]="!msg.self">
-                  <p *ngIf="selectedChat?.isGroup && !msg.self" class="text-xs font-semibold mb-1" [class.text-purple-600]="!msg.self">
-                    {{ msg.senderId?.name }}
-                  </p>
-                  <div class="text-sm leading-relaxed break-words" [innerHTML]="formatMessageContent(msg.content, msg.isFormatted)"></div>
-                  <div class="flex items-center justify-end space-x-1 mt-1">
-                    <span [class.text-purple-100]="msg.self" [class.text-gray-400]="!msg.self" class="text-xs">
-                      {{ msg.timestamp | date : "shortTime" }}
-                    </span>
-                    <svg *ngIf="msg.self" class="w-4 h-4 text-purple-100" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path>
-                    </svg>
-                  </div>
+            <!-- Regular Message -->
+            <div
+              *ngIf="!isSystemMessage(msg)"
+              [ngClass]="msg.self ? 'flex justify-end' : 'flex justify-start'"
+            >
+              <div
+                [ngClass]="
+                  msg.self
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+                    : 'bg-white text-gray-800'
+                "
+                class="max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl shadow-md"
+              >
+                <!-- Sender name for group chats (only for other users) -->
+                <div
+                  *ngIf="!msg.self && selectedChat?.isGroup"
+                  class="text-xs font-semibold mb-2"
+                  [ngClass]="msg.self ? 'text-purple-100' : 'text-purple-600'"
+                >
+                  {{ msg.sender?.name || "Unknown" }}
                 </div>
 
+             
+
+                                <div
+                  *ngIf="!msg.self && !selectedChat?.isGroup"
+                  class="text-xs font-semibold mb-2"
+                  [ngClass]="msg.self ? 'text-purple-100' : 'text-purple-600'"
+                >
+                  {{ msg.sender?.name || "Unknown" }}
+                </div>
+
+
+
+                <!-- Text Message -->
+                <div
+                  *ngIf="msg.type === 'text'"
+                  class="break-words whitespace-pre-wrap"
+                  [innerHTML]="
+                    formatMessageContent(msg.content, msg.isFormatted)
+                  "
+                ></div>
+
                 <!-- Image Message -->
-                <div *ngIf="isImageMessage(msg)" [class.bg-gradient-to-br]="msg.self" [class.from-purple-500]="msg.self" [class.to-pink-500]="msg.self" [class.bg-white]="!msg.self" class="p-2 rounded-2xl shadow-md" [class.rounded-br-sm]="msg.self" [class.rounded-bl-sm]="!msg.self">
-                  <img [src]="environmet.apiUrl + msg.fileMetadata?.url" [alt]="msg.content" class="max-w-full max-h-64 rounded-lg cursor-pointer object-cover" (click)="downloadFile(msg)" />
-                  <p class="text-xs mt-1 px-2" [class.text-white]="msg.self" [class.text-gray-600]="!msg.self">
-                    {{ msg.content }}
+                <div *ngIf="isImageMessage(msg)" class="space-y-2">
+                  <img
+                    [src]="environmet.apiUrl + msg.fileMetadata.url"
+                    [alt]="msg.fileMetadata.originalName"
+                    class="max-w-full h-auto rounded-lg cursor-pointer hover:opacity-90 transition-opacity shadow-md"
+                    (click)="downloadFile(msg)"
+                  />
+                  <p class="text-xs opacity-75">
+                    {{ msg.fileMetadata.originalName }}
                   </p>
                 </div>
 
                 <!-- Video Message -->
-                <div *ngIf="isVideoMessage(msg)" [class.bg-gradient-to-br]="msg.self" [class.from-purple-500]="msg.self" [class.to-pink-500]="msg.self" [class.bg-white]="!msg.self" class="p-2 rounded-2xl shadow-md" [class.rounded-br-sm]="msg.self" [class.rounded-bl-sm]="!msg.self">
-                  <video controls class="rounded-lg max-w-full max-h-64 cursor-pointer">
-                    <source [src]="environmet.apiUrl + msg.fileMetadata?.url" [type]="msg.fileMetadata?.mimeType" />
+                <div *ngIf="isVideoMessage(msg)" class="space-y-2">
+                  <video
+                    controls
+                    class="max-w-full h-auto rounded-lg shadow-md"
+                  >
+                    <source
+                      [src]="environmet.apiUrl + msg.fileMetadata.url"
+                      [type]="msg.fileMetadata.mimeType"
+                    />
                     Your browser does not support the video tag.
                   </video>
-                  <p class="text-xs mt-1 px-2" [class.text-white]="msg.self" [class.text-gray-600]="!msg.self">
-                    {{ msg.fileMetadata?.originalName }}
+                  <p class="text-xs opacity-75">
+                    {{ msg.fileMetadata.originalName }}
                   </p>
                 </div>
 
                 <!-- Audio Message -->
-                <div *ngIf="isAudioMessage(msg)" [class.bg-gradient-to-br]="msg.self" [class.from-purple-500]="msg.self" [class.to-pink-500]="msg.self" [class.bg-white]="!msg.self" class="p-3 rounded-2xl shadow-md flex flex-col items-start" [class.rounded-br-sm]="msg.self" [class.rounded-bl-sm]="!msg.self">
-                  <audio controls class="w-full rounded-lg">
-                    <source [src]="environmet.apiUrl + msg.fileMetadata?.url" [type]="msg.fileMetadata?.mimeType" />
-                    Your browser does not support the audio element.
+                <div *ngIf="isAudioMessage(msg)" class="space-y-2">
+                  <audio controls class="w-full max-w-sm">
+                    <source
+                      [src]="environmet.apiUrl + msg.fileMetadata.url"
+                      [type]="msg.fileMetadata.mimeType"
+                    />
+                    Your browser does not support the audio tag.
                   </audio>
-                  <p class="text-xs mt-2 px-2 truncate w-full" [class.text-white]="msg.self" [class.text-gray-600]="!msg.self">
-                    {{ msg.fileMetadata?.originalName }}
+                  <p class="text-xs opacity-75">
+                    {{ msg.fileMetadata.originalName }}
                   </p>
                 </div>
+
+                <!-- File Message -->
+                <div
+                  *ngIf="isFileMessage(msg)"
+                  (click)="downloadFile(msg)"
+                  class="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity p-2 rounded-lg"
+                  [ngClass]="
+                    msg.self ? 'hover:bg-white/10' : 'hover:bg-gray-100'
+                  "
+                >
+                  <div class="text-3xl flex-shrink-0">
+                    {{ getFileIcon(msg.fileMetadata.mimeType) }}
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="font-medium truncate">
+                      {{ msg.fileMetadata.originalName }}
+                    </p>
+                    <p class="text-xs opacity-75">
+                      {{ formatFileSize(msg.fileMetadata.size) }}
+                    </p>
+                  </div>
+                  <svg
+                    class="w-5 h-5 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                    />
+                  </svg>
+                </div>
+
+                <!-- Timestamp -->
+                <div class="text-xs opacity-75 mt-2 text-right">
+                  {{ msg.createdAt | date : "short" }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Warning Banner for Removed Users -->
+        <div
+          *ngIf="isRemovedFromGroup"
+          class="bg-red-50 border-t border-red-200 px-6 py-4 flex-shrink-0"
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <svg
+                class="w-6 h-6 text-red-500 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+              <div>
+                <p class="text-red-800 font-semibold">
+                  You are no longer a member of this group
+                </p>
+                <p class="text-red-600 text-sm">
+                  You cannot send messages or files
+                </p>
               </div>
             </div>
           </div>
         </div>
 
         <!-- File Preview -->
-        <div *ngIf="selectedFile" class="p-4 bg-gray-50 border-t border-gray-200 flex-shrink-0">
-          <div class="flex items-center space-x-3 bg-white p-3 rounded-lg shadow">
-            <img *ngIf="filePreview" [src]="filePreview" class="w-16 h-16 object-cover rounded flex-shrink-0" />
-            <div *ngIf="!filePreview" class="w-16 h-16 bg-gray-100 rounded flex items-center justify-center text-3xl flex-shrink-0">
-              {{ getFileIcon(selectedFile.type) }}
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-semibold truncate">{{ selectedFile.name }}</p>
-              <p class="text-xs text-gray-500">{{ formatFileSize(selectedFile.size) }}</p>
-              <div *ngIf="isUploading" class="mt-2">
-                <div class="w-full bg-gray-200 rounded-full h-1">
-                  <div class="bg-purple-500 h-1 rounded-full transition-all" [style.width.%]="uploadProgress"></div>
-                </div>
-              </div>
-            </div>
-            <button (click)="cancelFileUpload()" class="text-red-500 hover:text-red-700 transition-colors flex-shrink-0">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+
+        <div class="bg-white border-t px-6 py-4 flex-shrink-0">
+          <!-- File Preview -->
+          <div *ngIf="filePreview" class="mb-3 relative inline-block">
+            <img [src]="filePreview" class="h-20 rounded-lg shadow-md" />
+            <button
+              (click)="cancelFileUpload()"
+              class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
-        </div>
 
-        <!-- Formatting Toolbar -->
-        <div *ngIf="showFormattingHelp" class="px-6 py-2 bg-gray-50 border-t border-gray-200 flex-shrink-0">
-          <div class="flex items-center space-x-2 flex-wrap gap-2">
-            <button (click)="insertFormatting('bold')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 text-sm font-bold transition-colors">
-              B
-            </button>
-            <button (click)="insertFormatting('italic')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 text-sm italic transition-colors">
-              I
-            </button>
-            <button (click)="insertFormatting('strikethrough')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 text-sm line-through transition-colors">
-              S
-            </button>
-            <button (click)="insertFormatting('code')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 text-sm font-mono transition-colors">
-              &lt;/&gt;
-            </button>
-            <span class="text-xs text-gray-500 ml-auto hidden sm:inline">**bold** *italic* ~~strike~~ `code`</span>
+          <!-- Upload Progress -->
+          <div *ngIf="isUploading" class="mb-3">
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div
+                class="bg-purple-500 h-2 rounded-full transition-all duration-300"
+                [style.width.%]="uploadProgress"
+              ></div>
+            </div>
+            <p class="text-sm text-gray-600 mt-1">
+              Uploading... {{ uploadProgress }}%
+            </p>
           </div>
-        </div>
 
-        <!-- Message Input -->
-        <div class="bg-white border-t border-gray-200 p-4 shadow-lg flex-shrink-0">
+          <!-- Input Area -->
           <div class="flex items-end space-x-3">
-            <!-- File Upload -->
-            <button (click)="triggerFileUpload()" [disabled]="isUploading" class="p-3 text-gray-500 hover:bg-purple-50 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+            <!-- File Upload Button -->
+            <button
+              (click)="triggerFileUpload()"
+              [disabled]="isRemovedFromGroup"
+              [class.opacity-50]="isRemovedFromGroup"
+              [class.cursor-not-allowed]="isRemovedFromGroup"
+              class="bg-gray-100 hover:bg-gray-200 text-gray-600 p-3 rounded-xl transition-colors disabled:hover:bg-gray-100"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                />
               </svg>
             </button>
-            <input type="file" #fileInput (change)="onFileSelected($event)" class="hidden" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar" />
 
-            <!-- Formatting -->
-            <button (click)="toggleFormattingHelp()" class="p-3 text-gray-500 hover:bg-purple-50 rounded-xl transition-all flex-shrink-0">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-              </svg>
+            <!-- Hidden File Input -->
+            <input
+              #fileInput
+              type="file"
+              class="hidden"
+              (change)="onFileSelected($event)"
+              [disabled]="isRemovedFromGroup"
+            />
+
+            <!-- Emoji Picker Button -->
+            <button
+              (click)="toggleEmojiPicker()"
+              [disabled]="isRemovedFromGroup"
+              [class.opacity-50]="isRemovedFromGroup"
+              [class.cursor-not-allowed]="isRemovedFromGroup"
+              class="bg-gray-100 hover:bg-gray-200 text-gray-600 p-3 rounded-xl transition-colors disabled:hover:bg-gray-100"
+            >
+              😊
             </button>
 
             <!-- Message Input -->
-            <div class="flex-1 bg-gray-100 rounded-2xl px-4 py-3 focus-within:bg-white focus-within:ring-2 focus-within:ring-purple-500 transition-all min-w-0">
-              <textarea #messageInput [(ngModel)]="messageContent" (keydown.enter)="handleEnter($event)" placeholder="Type your message... (Shift+Enter for new line)" rows="1" class="w-full bg-transparent border-none outline-none resize-none text-gray-800 placeholder-gray-400 max-h-32"></textarea>
-            </div>
+            <div class="flex-1 relative">
+              <textarea
+                #messageInput
+                [(ngModel)]="messageContent"
+                [disabled]="isRemovedFromGroup"
+                [placeholder]="
+                  isRemovedFromGroup
+                    ? 'You cannot send messages in this group'
+                    : 'Type a message...'
+                "
+                (keydown.enter)="handleEnter($event)"
+                [class.opacity-50]="isRemovedFromGroup"
+                [class.cursor-not-allowed]="isRemovedFromGroup"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                rows="1"
+              >
+              </textarea>
 
-            <!-- Emoji -->
-            <div class="relative flex-shrink-0">
-              <button (click)="toggleEmojiPicker()" class="p-3 text-gray-500 hover:bg-purple-50 rounded-xl transition-all">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              <!-- Formatting Help Button -->
+              <button
+                (click)="toggleFormattingHelp()"
+                [disabled]="isRemovedFromGroup"
+                class="absolute right-2 top-2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
               </button>
-              <app-emoji-picker *ngIf="showEmojiPicker" (emojiSelected)="onEmojiSelected($event)" class="absolute bottom-full right-0 mb-2"></app-emoji-picker>
             </div>
 
             <!-- Send Button -->
-            <button (click)="sendMessage()" [disabled]="!messageContent.trim() || isUploading" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-3 rounded-xl hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95 flex-shrink-0">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+            <button
+              (click)="sendMessage()"
+              [disabled]="!messageContent.trim() || isRemovedFromGroup"
+              [class.opacity-50]="!messageContent.trim() || isRemovedFromGroup"
+              [class.cursor-not-allowed]="
+                !messageContent.trim() || isRemovedFromGroup
+              "
+              class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white p-3 rounded-xl transition-all disabled:hover:from-purple-500 disabled:hover:to-pink-500"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                />
               </svg>
             </button>
+          </div>
+
+          <!-- Emoji Picker Component -->
+          <app-emoji-picker
+            *ngIf="showEmojiPicker && !isRemovedFromGroup"
+            (emojiSelected)="onEmojiSelected($event)"
+          >
+          </app-emoji-picker>
+
+          <!-- Formatting Help -->
+          <div
+            *ngIf="showFormattingHelp && !isRemovedFromGroup"
+            class="mt-3 p-3 bg-gray-50 rounded-lg text-sm"
+          >
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="font-semibold text-gray-700">Text Formatting</h4>
+              <button
+                (click)="toggleFormattingHelp()"
+                class="text-gray-400 hover:text-gray-600"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <button
+                (click)="insertFormatting('bold')"
+                class="text-left px-2 py-1 hover:bg-gray-200 rounded"
+              >
+                <strong>**bold**</strong>
+              </button>
+              <button
+                (click)="insertFormatting('italic')"
+                class="text-left px-2 py-1 hover:bg-gray-200 rounded"
+              >
+                <em>*italic*</em>
+              </button>
+              <button
+                (click)="insertFormatting('strikethrough')"
+                class="text-left px-2 py-1 hover:bg-gray-200 rounded"
+              >
+                <s>~~strike~~</s>
+              </button>
+              <button
+                (click)="insertFormatting('code')"
+                class="text-left px-2 py-1 hover:bg-gray-200 rounded"
+              >
+                <code>`code`</code>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -264,14 +844,34 @@
   </div>
 
   <!-- Create Chat Modal -->
-  <div *ngIf="showCreateChat" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] flex flex-col">
-      <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-4 rounded-t-2xl flex-shrink-0">
+  <div
+    *ngIf="showCreateChat"
+    class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+  >
+    <div
+      class="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] flex flex-col"
+    >
+      <div
+        class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-4 rounded-t-2xl flex-shrink-0"
+      >
         <div class="flex items-center justify-between">
           <h3 class="text-xl font-bold">Create New Chat</h3>
-          <button (click)="showCreateChat = false" class="p-1 hover:bg-white/20 rounded-lg transition-all">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          <button
+            (click)="showCreateChat = false"
+            class="p-1 hover:bg-white/20 rounded-lg transition-all"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
             </svg>
           </button>
         </div>
@@ -279,42 +879,89 @@
 
       <div class="p-6 space-y-4 overflow-y-auto flex-1">
         <div class="flex space-x-2">
-          <button (click)="newChatType = 'private'; selectedUsers = []" [class.bg-gradient-to-r]="newChatType === 'private'" [class.from-purple-500]="newChatType === 'private'" [class.to-pink-500]="newChatType === 'private'" [class.text-white]="newChatType === 'private'" [class.bg-gray-100]="newChatType !== 'private'" class="flex-1 py-3 px-4 rounded-xl font-semibold transition-all transform hover:scale-105 active:scale-95">
+          <button
+            (click)="newChatType = 'private'; selectedUsers = []"
+            [class.bg-gradient-to-r]="newChatType === 'private'"
+            [class.from-purple-500]="newChatType === 'private'"
+            [class.to-pink-500]="newChatType === 'private'"
+            [class.text-white]="newChatType === 'private'"
+            [class.bg-gray-100]="newChatType !== 'private'"
+            class="flex-1 py-3 px-4 rounded-xl font-semibold transition-all transform hover:scale-105 active:scale-95"
+          >
             Private Chat
           </button>
-          <button (click)="newChatType = 'group'" [class.bg-gradient-to-r]="newChatType === 'group'" [class.from-purple-500]="newChatType === 'group'" [class.to-pink-500]="newChatType === 'group'" [class.text-white]="newChatType === 'group'" [class.bg-gray-100]="newChatType !== 'group'" class="flex-1 py-3 px-4 rounded-xl font-semibold transition-all transform hover:scale-105 active:scale-95">
+          <button
+            (click)="newChatType = 'group'"
+            [class.bg-gradient-to-r]="newChatType === 'group'"
+            [class.from-purple-500]="newChatType === 'group'"
+            [class.to-pink-500]="newChatType === 'group'"
+            [class.text-white]="newChatType === 'group'"
+            [class.bg-gray-100]="newChatType !== 'group'"
+            class="flex-1 py-3 px-4 rounded-xl font-semibold transition-all transform hover:scale-105 active:scale-95"
+          >
             Group Chat
           </button>
         </div>
 
         <div *ngIf="newChatType === 'group'">
-          <label class="block text-sm font-semibold text-gray-700 mb-2">Group Name</label>
-          <input [(ngModel)]="groupChatName" type="text" placeholder="Enter group name..." class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" />
+          <label class="block text-sm font-semibold text-gray-700 mb-2"
+            >Group Name</label
+          >
+          <input
+            [(ngModel)]="groupChatName"
+            type="text"
+            placeholder="Enter group name..."
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+          />
         </div>
 
         <div>
           <label class="block text-sm font-semibold text-gray-700 mb-2">
             {{ newChatType === "group" ? "Select Members" : "Select User" }}
           </label>
-          <div class="max-h-60 overflow-y-auto space-y-2 border border-gray-200 rounded-xl p-2">
-            <div *ngFor="let user of availableUsers" (click)="toggleUserSelection(user._id)" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 cursor-pointer transition-all" [class.bg-purple-100]="isUserSelected(user._id)">
-              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center text-white font-bold shadow-md flex-shrink-0">
+          <div
+            class="max-h-60 overflow-y-auto space-y-2 border border-gray-200 rounded-xl p-2"
+          >
+            <div
+              *ngFor="let user of availableUsers"
+              (click)="toggleUserSelection(user._id)"
+              class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 cursor-pointer transition-all"
+              [class.bg-purple-100]="isUserSelected(user._id)"
+            >
+              <div
+                class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center text-white font-bold shadow-md flex-shrink-0"
+              >
                 {{ user.name?.charAt(0).toUpperCase() }}
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-semibold text-gray-800">{{ user.name }}</p>
+                <p class="text-sm font-semibold text-gray-800">
+                  {{ user.name }}
+                </p>
                 <p class="text-xs text-gray-500 truncate">{{ user.email }}</p>
               </div>
-              <div *ngIf="isUserSelected(user._id)" class="w-6 h-6 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0">
-                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path>
+              <div
+                *ngIf="isUserSelected(user._id)"
+                class="w-6 h-6 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0"
+              >
+                <svg
+                  class="w-4 h-4 text-white"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  ></path>
                 </svg>
               </div>
             </div>
           </div>
         </div>
 
-        <button (click)="handleCreateChat()" [disabled]="isCreateDisabled()" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95">
+        <button
+          (click)="handleCreateChat()"
+          [disabled]="isCreateDisabled()"
+          class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95"
+        >
           <span *ngIf="!isLoading">Create Chat</span>
           <span *ngIf="isLoading" class="flex items-center justify-center">
             <div class="spinner mr-2"></div>

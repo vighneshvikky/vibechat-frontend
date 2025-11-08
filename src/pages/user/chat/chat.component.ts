@@ -29,18 +29,16 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('messagesContainer')
   messagesContainer!: ElementRef<HTMLDivElement>;
 
-
   showCreateChat: boolean = false;
   newChatType: 'private' | 'group' = 'private';
   selectedUsers: string[] = [];
   groupChatName: string = '';
   isLoading: boolean = false;
   searchTerm: string = '';
+   isRemovedFromGroup: boolean = false;
 
- 
   showEmojiPicker: boolean = false;
 
-  
   selectedFile: File | null = null;
   filePreview: string | null = null;
   uploadProgress: number = 0;
@@ -51,7 +49,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   private isNearBottom = true;
   environmet = environment;
 
-    messageContent: string = '';
+  showGroupDetails: boolean = false;
+  showAddMemberModal: boolean = false;
+  availableUsersForGroup: any[] = [];
+  isGroupAdmin: boolean = false;
+
+  messageContent: string = '';
   currentUser: any;
   availableUsers: any[] = [];
   messages: any[] = [];
@@ -82,7 +85,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
             console.log('📥 NEW MESSAGE EVENT:', msg);
 
             if (this.selectedChat && msg.chatId === this.selectedChat._id) {
-     
               const senderIdValue = this.getSenderId(msg);
 
               const newMessage = {
@@ -93,17 +95,17 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
               console.log('✅ Adding message to UI:', newMessage);
               this.messages.push(newMessage);
 
-           
-              if (this.isNearBottom || newMessage.self) {
-                this.scrollToBottom();
-              }
+              setTimeout(() => {
+                if (this.isNearBottom || newMessage.self) {
+                  this.scrollToBottom();
+                }
+              }, 100);
             }
 
             this.loadChats();
           })
         );
 
-       
         this.subscriptions.push(
           this.socketService.privateChatCreated$.subscribe((data: any) => {
             console.log('💬 Private chat created successfully:', data);
@@ -119,7 +121,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
           })
         );
 
-
         this.subscriptions.push(
           this.socketService.userTyping$.subscribe((data: any) => {
             console.log('⌨️ User typing:', data);
@@ -133,7 +134,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
           })
         );
 
-     
         this.subscriptions.push(
           this.socketService.groupCreated$.subscribe((data: any) => {
             console.log('✅ Group created successfully:', data);
@@ -148,7 +148,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
           })
         );
 
-     
         this.subscriptions.push(
           this.socketService.newGroup$.subscribe((group: any) => {
             console.log('👥 New group notification:', group);
@@ -156,12 +155,82 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
           })
         );
 
-      
         this.subscriptions.push(
           this.socketService.addedToGroup$.subscribe((group: any) => {
             this.loadChats();
           })
         );
+
+         this.subscriptions.push(
+          this.socketService.userAddedToGroup$.subscribe((data: any) => {
+            console.log('➕ User added to group event:', data);
+            if (this.selectedChat && data.chatId === this.selectedChat._id) {
+              this.selectedChat = data.group;
+              this.checkIfAdmin();
+            }
+            this.loadChats();
+          })
+        );
+
+        this.subscriptions.push(
+          this.socketService.userRemovedFromGroup$.subscribe((data: any) => {
+            console.log('➖ User removed from group event:', data);
+            if (this.selectedChat && data.chatId === this.selectedChat._id) {
+              this.selectedChat = data.group;
+              this.checkIfAdmin();
+            }
+            this.loadChats();
+          })
+        );
+
+        this.subscriptions.push(
+  this.socketService.userRemovedFromGroup$.subscribe((data: any) => {
+    console.log('➖ User removed from group event:', data);
+    if (this.selectedChat && data.chatId === this.selectedChat._id) {
+      this.selectedChat = data.group;
+      this.checkIfAdmin();
+      
+      // Check if current user was removed
+      const memberIds = (data.group.members || []).map((m: any) => 
+        typeof m === 'object' ? m._id : m
+      );
+      
+      if (!memberIds.includes(this.currentUser._id)) {
+        this.isRemovedFromGroup = true;
+      }
+    }
+    this.loadChats();
+  })
+);
+
+// Add subscription for when current user is specifically notified of removal
+this.subscriptions.push(
+  this.socketService.removedFromGroup$.subscribe((data: any) => {
+    console.log('🚫 You were removed from group:', data);
+    
+    if (this.selectedChat && data.chatId === this.selectedChat._id) {
+      this.isRemovedFromGroup = true;
+      this.messageContent = '';
+      
+      // Show alert to user
+      const message = data.isKicked 
+        ? `You have been removed from "${data.groupName}"`
+        : `You have left "${data.groupName}"`;
+      
+      alert(message);
+      
+      // Clear the selected chat after a delay
+      setTimeout(() => {
+        this.selectedChat = null;
+        this.messages = [];
+        this.showGroupDetails = false;
+        this.isRemovedFromGroup = false;
+      }, 2000);
+    }
+    
+    this.loadChats(); // Refresh chat list
+  })
+);
 
         this.loadUsers();
         this.loadChats();
@@ -171,7 +240,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
       },
     });
   }
-
 
   private getSenderId(msg: any): string {
     if (msg.sender) {
@@ -183,23 +251,44 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     return '';
   }
 
+  
+
   onSearchChange(): void {
     this.loadChats();
   }
 
   ngAfterViewInit() {
-    // Initial scroll setup
+    
     if (this.messagesContainer) {
       console.log('✅ Messages container initialized');
     }
   }
 
+  
   handleEnter(event: Event) {
     const e = event as KeyboardEvent;
     if (e.shiftKey) return;
     e.preventDefault();
     this.sendMessage();
   }
+
+  checkIfAdmin() {
+    if (!this.selectedChat || !this.selectedChat.isGroup) {
+      this.isGroupAdmin = false;
+      return;
+    }
+
+    
+    
+    
+    const members = this.selectedChat.members || [];
+    this.isGroupAdmin = members.length > 0 && 
+      this.getMemberId(members[0]) === this.currentUser._id;
+  }
+
+  isSystemMessage(message: any): boolean {
+  return message.type === 'system';
+}
 
   loadUsers(): void {
     this.userService.listAllUser().subscribe({
@@ -214,17 +303,117 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
+    getMemberId(member: any): string {
+    return typeof member === 'object' ? member._id : member;
+  }
+
+  getMemberName(member: any): string {
+    return typeof member === 'object' ? member.name : 'Unknown';
+  }
+
+  
+  getMemberEmail(member: any): string {
+    return typeof member === 'object' ? member.email : '';
+  }
+
+   loadAvailableUsersForGroup() {
+    if (!this.selectedChat || !this.selectedChat.isGroup) return;
+
+    const currentMemberIds = (this.selectedChat.members || []).map((m: any) => 
+      this.getMemberId(m)
+    );
+
+    this.availableUsersForGroup = this.availableUsers.filter(
+      (user) => !currentMemberIds.includes(user._id)
+    );
+  }
+
+  // Show add member modal
+  openAddMemberModal() {
+    this.showAddMemberModal = true;
+    this.loadAvailableUsersForGroup();
+  }
+
+  // Close add member modal
+  closeAddMemberModal() {
+    this.showAddMemberModal = false;
+  }
+
+  // Add user to group
+  addUserToGroup(userId: string) {
+    if (!this.selectedChat || !this.isGroupAdmin) return;
+
+    this.socketService.addUserToGroup(
+      this.selectedChat._id,
+      userId,
+      this.currentUser._id
+    );
+
+    this.showAddMemberModal = false;
+  }
+
+  // Remove user from group
+  removeUserFromGroup(userId: string) {
+    if (!this.selectedChat || !this.isGroupAdmin) return;
+    if (userId === this.currentUser._id) {
+      alert('You cannot remove yourself as admin');
+      return;
+    }
+
+    const memberName = this.selectedChat.members.find(
+      (m: any) => this.getMemberId(m) === userId
+    );
+    const name = this.getMemberName(memberName);
+
+    if (confirm(`Remove ${name} from the group?`)) {
+      this.socketService.removeUserFromGroup(
+        this.selectedChat._id,
+        userId,
+        this.currentUser._id
+      );
+    }
+  }
+
+  // Leave group (for non-admin members)
+  leaveGroup() {
+    if (!this.selectedChat || !this.selectedChat.isGroup) return;
+    if (this.isGroupAdmin) {
+      alert('As admin, you cannot leave the group. Please transfer admin rights first.');
+      return;
+    }
+
+    if (confirm('Are you sure you want to leave this group?')) {
+      this.socketService.removeUserFromGroup(
+        this.selectedChat._id,
+        this.currentUser._id,
+        this.currentUser._id
+      );
+      this.selectedChat = null;
+      this.showGroupDetails = false;
+    }
+  }
+
+  // Get member count
+  getMemberCount(): number {
+    return this.selectedChat?.members?.length || 0;
+  }
+
+
+
+
   loadChats(): void {
     if (!this.currentUser) return;
 
-    this.chatService.getUserChats(this.currentUser._id, this.searchTerm).subscribe({
-      next: (chats) => {
-        this.chats = chats;
-      },
-      error: (error) => {
-        console.error('Error loading chats:', error);
-      },
-    });
+    this.chatService
+      .getUserChats(this.currentUser._id, this.searchTerm)
+      .subscribe({
+        next: (chats) => {
+          this.chats = chats;
+        },
+        error: (error) => {
+          console.error('Error loading chats:', error);
+        },
+      });
   }
 
   selectPrivateChat(user: any) {
@@ -258,14 +447,15 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   selectExistingChat(chat: any) {
     this.selectedChat = chat;
     this.messages = [];
+    this.showGroupDetails = false;
     this.socketService.joinRoom(chat._id, this.currentUser._id);
     this.loadMessages(chat._id);
+    this.checkIfAdmin();
   }
 
   loadMessages(chatId: string) {
     this.chatService.getChatMessages(chatId).subscribe({
       next: (res) => {
-   
         this.messages = res.map((msg: any) => {
           const senderIdValue = this.getSenderId(msg);
           return {
@@ -274,7 +464,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
           };
         });
         console.log('Loaded messages:', this.messages);
-     
+
         setTimeout(() => this.scrollToBottom(), 100);
       },
       error: (error) => {
@@ -325,6 +515,17 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     this.fileInput.nativeElement.click();
   }
 
+    toggleGroupDetails() {
+    if (!this.selectedChat) return;
+    this.showGroupDetails = !this.showGroupDetails;
+    if (this.showGroupDetails) {
+      this.checkIfAdmin();
+      this.loadAvailableUsersForGroup();
+    }
+  }
+
+  
+
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (!file) return;
@@ -366,14 +567,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
         next: (response) => {
           console.log('✅ File uploaded:', response);
 
-
-                const newMessage = {
-          ...response.message,
-          self: true,
-        };
-
-        this.messages.push(newMessage);
-
           this.selectedFile = null;
           this.filePreview = null;
           this.isUploading = false;
@@ -382,8 +575,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
           if (this.fileInput) {
             this.fileInput.nativeElement.value = '';
           }
-
-          setTimeout(() => this.scrollToBottom(), 100);
         },
         error: (error) => {
           console.error('❌ File upload error:', error);
@@ -454,7 +645,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     }, 0);
   }
 
-  // Scroll management
   onScroll() {
     if (!this.messagesContainer) return;
 

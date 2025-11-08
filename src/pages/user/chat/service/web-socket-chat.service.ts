@@ -1,4 +1,3 @@
-
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject, Subject } from 'rxjs';
@@ -38,11 +37,17 @@ export class SocketService {
   public messageSent$ = this.messageSentSubject.asObservable();
   public messageError$ = this.messageErrorSubject.asObservable();
 
+    private removedFromGroupSubject = new Subject<any>();
+  
+
+  public removedFromGroup$ = this.removedFromGroupSubject.asObservable();
+
   public newGroup$ = this.newGroupSubject.asObservable();
   public groupCreated$ = this.groupCreatedSubject.asObservable();
   public addedToGroup$ = this.addedToGroupSubject.asObservable();
   public userAddedToGroup$ = this.userAddedToGroupSubject.asObservable();
-  public userRemovedFromGroup$ = this.userRemovedFromGroupSubject.asObservable();
+  public userRemovedFromGroup$ =
+    this.userRemovedFromGroupSubject.asObservable();
 
   public privateChatCreated$ = this.privateChatCreatedSubject.asObservable();
 
@@ -153,7 +158,15 @@ export class SocketService {
       this.privateChatCreatedSubject.next(data);
     });
 
+        this.socket.on('removedFromGroup', (data: any) => {
+      console.log('🚫 Removed from group:', data);
+      this.removedFromGroupSubject.next(data);
+    });
+
+
     console.log('✅ All socket event listeners set up');
+
+
   }
 
   joinRoom(chatId: string, userId: string) {
@@ -203,7 +216,6 @@ export class SocketService {
     console.log('✅ Message emitted to server');
   }
 
-
   createPrivateChat(userId1: string, userId2: string) {
     if (!this.socket) {
       console.error('❌ Socket not connected!');
@@ -216,19 +228,19 @@ export class SocketService {
 
   createGroup(name: string, participants: string[], createdBy: string) {
     if (!this.socket) return;
-    
+
     this.socket.emit('createGroup', { name, participants, createdBy });
   }
 
   addUserToGroup(chatId: string, userId: string, addedBy: string) {
     if (!this.socket) return;
-    
+
     this.socket.emit('addUserToGroup', { chatId, userId, addedBy });
   }
 
   removeUserFromGroup(chatId: string, userId: string, removedBy: string) {
     if (!this.socket) return;
-    
+
     this.socket.emit('removeUserFromGroup', { chatId, userId, removedBy });
   }
 
