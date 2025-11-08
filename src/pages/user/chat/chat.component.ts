@@ -22,7 +22,12 @@ import { NotificationModalComponent } from '../../../core/shared/modals/notifica
   selector: 'app-chat',
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss'],
-  imports: [FormsModule, CommonModule, EmojiPickerComponent, NotificationModalComponent],
+  imports: [
+    FormsModule,
+    CommonModule,
+    EmojiPickerComponent,
+    NotificationModalComponent,
+  ],
 })
 export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -112,24 +117,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
                   this.scrollToBottom();
                 }
               }, 100);
-            } else {
-              if (msg.type !== 'system') {
-                const senderName = msg.sender?.name || 'Someone';
-                const chatName =
-                  this.chats.find((c) => c._id === msg.chatId)?.name ||
-                  'a chat';
-
-                this.showModal(
-                  'New Message',
-                  `${senderName} sent a message in ${chatName}`,
-                  'info',
-                  msg.type === 'text'
-                    ? msg.content.substring(0, 50) + '...'
-                    : 'New file'
-                );
-              }
             }
-
             this.loadChats();
           })
         );
@@ -218,7 +206,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
               this.selectedChat = data.group;
               this.checkIfAdmin();
 
-             
               const memberIds = (data.group.members || []).map((m: any) =>
                 typeof m === 'object' ? m._id : m
               );
@@ -230,7 +217,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
             this.loadChats();
           })
         );
-
 
         this.subscriptions.push(
           this.socketService.removedFromGroup$.subscribe((data: any) => {
@@ -245,20 +231,20 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
                 ? `You have been removed from "${data.groupName}"`
                 : `You have left "${data.groupName}"`;
 
-   this.showModal(
-        data.isKicked ? 'Removed from Group' : 'Left Group',
-        message,
-        'warning',
-        'You will no longer receive messages from this group',
-        false,
-        'OK',
-        () => {
-          this.selectedChat = null;
-          this.messages = [];
-          this.showGroupDetails = false;
-          this.isRemovedFromGroup = false;
-        }
-      );
+              this.showModal(
+                data.isKicked ? 'Removed from Group' : 'Left Group',
+                message,
+                'warning',
+                'You will no longer receive messages from this group',
+                false,
+                'OK',
+                () => {
+                  this.selectedChat = null;
+                  this.messages = [];
+                  this.showGroupDetails = false;
+                  this.isRemovedFromGroup = false;
+                }
+              );
             }
 
             this.loadChats(); // Refresh chat list
@@ -446,12 +432,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   removeUserFromGroup(userId: string) {
     if (!this.selectedChat || !this.isGroupAdmin) return;
     if (userId === this.currentUser._id) {
-          this.showModal(
-      'Cannot Remove Self',
-      'You cannot remove yourself as admin',
-      'warning',
-      'Please transfer admin rights to another member first'
-    );
+      this.showModal(
+        'Cannot Remove Self',
+        'You cannot remove yourself as admin',
+        'warning',
+        'Please transfer admin rights to another member first'
+      );
       return;
     }
 
@@ -460,54 +446,52 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     );
     const name = this.getMemberName(memberName);
 
-  this.showModal(
-    'Remove Member',
-    `Are you sure you want to remove ${name} from the group?`,
-    'warning',
-    'This action cannot be undone',
-    true,
-    'Remove',
-    () => {
-      this.socketService.removeUserFromGroup(
-        this.selectedChat._id,
-        userId,
-        this.currentUser._id
-      );
-    }
-  );
-
+    this.showModal(
+      'Remove Member',
+      `Are you sure you want to remove ${name} from the group?`,
+      'warning',
+      'This action cannot be undone',
+      true,
+      'Remove',
+      () => {
+        this.socketService.removeUserFromGroup(
+          this.selectedChat._id,
+          userId,
+          this.currentUser._id
+        );
+      }
+    );
   }
 
- 
   leaveGroup() {
     if (!this.selectedChat || !this.selectedChat.isGroup) return;
     if (this.isGroupAdmin) {
-   this.showModal(
-      'Cannot Leave Group',
-      'As admin, you cannot leave the group',
-      'warning',
-      'Please transfer admin rights to another member first'
-    );
+      this.showModal(
+        'Cannot Leave Group',
+        'As admin, you cannot leave the group',
+        'warning',
+        'Please transfer admin rights to another member first'
+      );
       return;
     }
 
- this.showModal(
-    'Leave Group',
-    `Are you sure you want to leave "${this.selectedChat.name}"?`,
-    'warning',
-    'You will need to be re-added by an admin to rejoin',
-    true,
-    'Leave',
-    () => {
-      this.socketService.removeUserFromGroup(
-        this.selectedChat._id,
-        this.currentUser._id,
-        this.currentUser._id
-      );
-      this.selectedChat = null;
-      this.showGroupDetails = false;
-    }
-  );
+    this.showModal(
+      'Leave Group',
+      `Are you sure you want to leave "${this.selectedChat.name}"?`,
+      'warning',
+      'You will need to be re-added by an admin to rejoin',
+      true,
+      'Leave',
+      () => {
+        this.socketService.removeUserFromGroup(
+          this.selectedChat._id,
+          this.currentUser._id,
+          this.currentUser._id
+        );
+        this.selectedChat = null;
+        this.showGroupDetails = false;
+      }
+    );
   }
 
   getMemberCount(): number {
@@ -539,11 +523,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 
   createGroupChat() {
     if (!this.groupChatName || this.selectedUsers.length === 0) {
-          this.showModal(
-      'Invalid Input',
-      'Please enter a group name and select at least one member',
-      'warning'
-    );
+      this.showModal(
+        'Invalid Input',
+        'Please enter a group name and select at least one member',
+        'warning'
+      );
       return;
     }
 
@@ -561,16 +545,16 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     this.selectedUsers = [];
 
     this.subscriptions.push(
-  this.socketService.messageError$.subscribe((error: any) => {
-    console.error('❌ Message error:', error);
-    this.showModal(
-      'Message Error',
-      'Failed to send message',
-      'error',
-      error.message || 'Please try again'
+      this.socketService.messageError$.subscribe((error: any) => {
+        console.error('❌ Message error:', error);
+        this.showModal(
+          'Message Error',
+          'Failed to send message',
+          'error',
+          error.message || 'Please try again'
+        );
+      })
     );
-  })
-);
   }
 
   selectExistingChat(chat: any) {
@@ -705,12 +689,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
         },
         error: (error) => {
           console.error('❌ File upload error:', error);
-             this.showModal(
-          'Upload Failed',
-          'Failed to upload file',
-          'error',
-          error.message || 'Please try again with a smaller file'
-        );
+          this.showModal(
+            'Upload Failed',
+            'Failed to upload file',
+            'error',
+            error.message || 'Please try again with a smaller file'
+          );
           this.isUploading = false;
           this.uploadProgress = 0;
         },
