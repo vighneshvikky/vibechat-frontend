@@ -247,7 +247,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
               );
             }
 
-            this.loadChats(); // Refresh chat list
+            this.loadChats();
           })
         );
 

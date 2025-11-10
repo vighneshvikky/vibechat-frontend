@@ -1,4 +1,4 @@
-// gradient-button.component.ts
+
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -17,7 +17,7 @@ import { CommonModule } from '@angular/common';
         *ngIf="!loading"
         class="flex items-center justify-center space-x-2"
       >
-        <!-- Leading Icon -->
+       
         <svg
           *ngIf="leadingIcon && !trailingIcon"
           class="w-5 h-5"
@@ -27,10 +27,9 @@ import { CommonModule } from '@angular/common';
           [innerHTML]="getIconPath(leadingIcon)"
         ></svg>
 
-        <!-- Button Text -->
+    
         <span>{{ text }}</span>
 
-        <!-- Trailing Icon -->
         <svg
           *ngIf="trailingIcon"
           class="w-5 h-5"

@@ -68,12 +68,10 @@ export class SignupComponent implements OnInit {
       }
     );
 
-   
     this.signupForm.get('password')?.valueChanges.subscribe((password) => {
       this.calculatePasswordStrength(password || '');
     });
 
- 
     this.signupForm.get('password')?.valueChanges.subscribe(() => {
       this.signupForm.get('confirmPassword')?.updateValueAndValidity();
     });
@@ -93,7 +91,6 @@ export class SignupComponent implements OnInit {
       return { invalidName: true };
     }
 
-
     const hasLetter = /[a-zA-Z]/.test(control.value);
     if (!hasLetter) {
       return { invalidName: true };
@@ -112,14 +109,11 @@ export class SignupComponent implements OnInit {
       return { invalidEmail: true };
     }
 
- 
     const value = control.value.trim();
 
- 
     if (value.includes('..')) {
       return { invalidEmail: true };
     }
-
 
     if (/^[._%+-]|[._%+-]$/.test(value.split('@')[0])) {
       return { invalidEmail: true };
@@ -138,22 +132,18 @@ export class SignupComponent implements OnInit {
       errors['noUpperCase'] = true;
     }
 
-   
     if (!/[a-z]/.test(password)) {
       errors['noLowerCase'] = true;
     }
 
-    
     if (!/[0-9]/.test(password)) {
       errors['noNumber'] = true;
     }
-
 
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
       errors['noSpecialChar'] = true;
     }
 
-  
     const commonPasswords = ['password', '12345678', 'qwerty', 'abc123'];
     if (commonPasswords.some((weak) => password.toLowerCase().includes(weak))) {
       errors['commonPassword'] = true;
@@ -166,7 +156,6 @@ export class SignupComponent implements OnInit {
     return Object.keys(errors).length > 0 ? errors : null;
   }
 
-
   passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
     const password = group.get('password')?.value;
     const confirmPassword = group.get('confirmPassword')?.value;
@@ -177,7 +166,6 @@ export class SignupComponent implements OnInit {
 
     return password === confirmPassword ? null : { passwordMismatch: true };
   }
-
 
   calculatePasswordStrength(password: string): void {
     if (!password) {
@@ -191,7 +179,6 @@ export class SignupComponent implements OnInit {
     if (password.length >= 12) score++;
     if (password.length >= 16) score++;
 
-   
     if (/[a-z]/.test(password)) score++;
     if (/[A-Z]/.test(password)) score++;
     if (/[0-9]/.test(password)) score++;
@@ -213,7 +200,6 @@ export class SignupComponent implements OnInit {
     if (commonPasswords.some((weak) => password.toLowerCase().includes(weak))) {
       score = Math.max(0, score - 2);
     }
-
 
     const normalizedScore = Math.min(4, Math.max(1, Math.ceil(score / 2)));
 
@@ -269,7 +255,6 @@ export class SignupComponent implements OnInit {
     });
   }
 
-
   getFormValidationErrors(): any[] {
     const errors: any[] = [];
     Object.keys(this.signupForm.controls).forEach((key) => {
@@ -322,12 +307,10 @@ export class SignupComponent implements OnInit {
     return password && /[0-9]/.test(password);
   }
 
-
   hasSpecialChar(): boolean {
     const password = this.signupForm.get('password')?.value;
     return password && /[!@#$%^&*(),.?":{}|<>]/.test(password);
   }
-
 
   hasMinLength(): boolean {
     const password = this.signupForm.get('password')?.value;
@@ -340,7 +323,6 @@ export class SignupComponent implements OnInit {
       (this.signupForm.get('confirmPassword')?.touched || this.submitted)
     );
   }
-
 
   getErrorMessage(fieldName: string): string {
     const field = this.signupForm.get(fieldName);
