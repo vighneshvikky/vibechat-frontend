@@ -3,35 +3,40 @@ import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
+export interface FileMetadata {
+  originalName: string;
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+  url: string;
+}
+
 @Injectable({
   providedIn: 'root',
-})
+})  
 export class SocketService {
   private socket!: Socket;
   public isConnected$ = new BehaviorSubject<boolean>(false);
   private currentUserId: string = '';
 
-  // Subjects for real-time events
+
   private newMessageSubject = new Subject<any>();
-  private userTypingSubject = new Subject<any>();
   private roomJoinedSubject = new Subject<any>();
   private userJoinedSubject = new Subject<any>();
   private messageSentSubject = new Subject<any>();
   private messageErrorSubject = new Subject<any>();
 
-  // Group subjects
+
   private newGroupSubject = new Subject<any>();
   private groupCreatedSubject = new Subject<any>();
   private addedToGroupSubject = new Subject<any>();
   private userAddedToGroupSubject = new Subject<any>();
   private userRemovedFromGroupSubject = new Subject<any>();
 
-  // Private chat subjects
+
   private privateChatCreatedSubject = new Subject<any>();
 
-  // Observables
   public newMessage$ = this.newMessageSubject.asObservable();
-  public userTyping$ = this.userTypingSubject.asObservable();
   public roomJoined$ = this.roomJoinedSubject.asObservable();
   public userJoined$ = this.userJoinedSubject.asObservable();
   public messageSent$ = this.messageSentSubject.asObservable();
@@ -55,7 +60,6 @@ export class SocketService {
 
   connect(userId?: string) {
     if (this.socket && this.socket.connected) {
-      console.log('⚠️ Socket already connected');
       return;
     }
 
@@ -63,7 +67,7 @@ export class SocketService {
       this.currentUserId = userId;
     }
 
-    console.log('🔌 Connecting socket with userId:', userId);
+   
 
     this.socket = io(environment.socketUrl, {
       transports: ['websocket'],
@@ -84,81 +88,78 @@ export class SocketService {
       this.isConnected$.next(false);
     });
 
-    this.socket.on('error', (error: any) => {
+    this.socket.on('error', (error) => {
       console.error('❌ Socket error:', error);
     });
 
-    this.socket.on('roomJoined', (data: any) => {
+    this.socket.on('roomJoined', (data) => {
       console.log('🚪 Joined room:', data);
       this.roomJoinedSubject.next(data);
     });
 
-    this.socket.on('userJoined', (data: any) => {
+    this.socket.on('userJoined', (data) => {
       console.log('👤 User joined:', data);
       this.userJoinedSubject.next(data);
     });
 
-    this.socket.on('userLeft', (data: any) => {
+    this.socket.on('userLeft', (data) => {
       console.log('👋 User left:', data);
     });
 
-    this.socket.on('messageSent', (data: any) => {
+    this.socket.on('messageSent', (data) => {
       console.log('✅ Message sent confirmation:', data);
       this.messageSentSubject.next(data);
     });
 
-    this.socket.on('messageError', (error: any) => {
+    this.socket.on('messageError', (error) => {
       console.error('❌ Message error:', error);
       this.messageErrorSubject.next(error);
     });
 
-    this.socket.on('newMessage', (message: any) => {
+    this.socket.on('newMessage', (message) => {
       console.log('📥 NEW MESSAGE RECEIVED FROM SERVER:', message);
       this.newMessageSubject.next(message);
     });
 
-    this.socket.on('userTyping', (data: any) => {
-      console.log('⌨️ User typing:', data);
-      this.userTypingSubject.next(data);
-    });
 
-    // Group events
-    this.socket.on('newGroup', (group: any) => {
+
+   
+    this.socket.on('newGroup', (group) => {
       console.log('👥 New group received:', group);
       this.newGroupSubject.next(group);
     });
 
-    this.socket.on('groupCreated', (data: any) => {
+    this.socket.on('groupCreated', (data) => {
       console.log('✅ Group created confirmation:', data);
       this.groupCreatedSubject.next(data);
     });
 
-    this.socket.on('addedToGroup', (group: any) => {
+    this.socket.on('addedToGroup', (group) => {
       console.log('➕ Added to group:', group);
       this.addedToGroupSubject.next(group);
     });
 
-    this.socket.on('userAddedToGroup', (data: any) => {
+    this.socket.on('userAddedToGroup', (data) => {
       console.log('👤 User added to group:', data);
       this.userAddedToGroupSubject.next(data);
     });
 
-    this.socket.on('userRemovedFromGroup', (data: any) => {
+    this.socket.on('userRemovedFromGroup', (data) => {
       console.log('👤 User removed from group:', data);
       this.userRemovedFromGroupSubject.next(data);
     });
 
-    this.socket.on('groupError', (error: any) => {
+    this.socket.on('groupError', (error) => {
       console.error('❌ Group error:', error);
     });
 
     // Private chat events
-    this.socket.on('privateChatCreated', (data: any) => {
+    this.socket.on('privateChatCreated', (data) => {
       console.log('💬 Private chat created:', data);
       this.privateChatCreatedSubject.next(data);
     });
 
-        this.socket.on('removedFromGroup', (data: any) => {
+        this.socket.on('removedFromGroup', (data) => {
       console.log('🚫 Removed from group:', data);
       this.removedFromGroupSubject.next(data);
     });
@@ -191,7 +192,7 @@ export class SocketService {
     senderId: string,
     content: string,
     type: string = 'text',
-    fileMetadata?: any
+    fileMetadata?: FileMetadata
   ) {
     if (!this.socket) {
       console.error('❌ Socket not connected!');

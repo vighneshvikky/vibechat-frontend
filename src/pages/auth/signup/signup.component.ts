@@ -255,8 +255,8 @@ export class SignupComponent implements OnInit {
     });
   }
 
-  getFormValidationErrors(): any[] {
-    const errors: any[] = [];
+  getFormValidationErrors() {
+    const errors = [];
     Object.keys(this.signupForm.controls).forEach((key) => {
       const control = this.signupForm.get(key);
       if (control && control.errors) {
@@ -275,25 +275,18 @@ export class SignupComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  /**
-   * Check if a specific field has any error
-   */
   hasError(fieldName: string): boolean {
     const field = this.signupForm.get(fieldName);
     return !!(field && field.errors && (field.touched || this.submitted));
   }
 
-  /**
-   * Check if password has uppercase letter
-   */
+
   hasUpperCase(): boolean {
     const password = this.signupForm.get('password')?.value;
     return password && /[A-Z]/.test(password);
   }
 
-  /**
-   * Check if password has lowercase letter
-   */
+
   hasLowerCase(): boolean {
     const password = this.signupForm.get('password')?.value;
     return password && /[a-z]/.test(password);

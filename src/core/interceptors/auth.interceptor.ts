@@ -3,18 +3,19 @@ import {
   HttpErrorResponse,
   HttpRequest,
   HttpHandlerFn,
+  HttpEvent,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, switchMap, throwError } from 'rxjs';
+import { catchError, switchMap, throwError, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { ToastrService } from 'ngx-toastr';
 
 export const AuthInterceptor: HttpInterceptorFn = (
-  req: HttpRequest<any>,
+  req: HttpRequest<unknown>,
   next: HttpHandlerFn
-) => {
+): Observable<HttpEvent<unknown>> => {
   const router = inject(Router);
   const http = inject(HttpClient);
   const toastr = inject(ToastrService);
@@ -25,9 +26,7 @@ export const AuthInterceptor: HttpInterceptorFn = (
     catchError((error: HttpErrorResponse) => {
       console.error('🚨 Intercepted error:', error);
 
-      // ✅ Handle Unauthorized (401) errors
       if (error.status === 401) {
-        // If the request is NOT refresh and not login/register
         if (
           !req.url.includes('/auth/refresh') &&
           !req.url.includes('/auth/login') &&
@@ -36,23 +35,27 @@ export const AuthInterceptor: HttpInterceptorFn = (
           console.warn('🔄 Access token expired, trying refresh...');
 
           return http
-            .get(`${environment.apiUrl}/auth/refresh`, { withCredentials: true })
+            .get(`${environment.apiUrl}/auth/refresh`, {
+              withCredentials: true,
+            })
             .pipe(
-              switchMap(() => {
-                // Retry original request
-                return next(req.clone({ withCredentials: true }));
-              }),
+              switchMap(() => next(req.clone({ withCredentials: true }))),
               catchError((refreshError: HttpErrorResponse) => {
                 console.error('❌ Refresh failed:', refreshError);
-                toastr.error('Session expired. Please log in again.', 'Authentication Error');
+                toastr.error(
+                  'Session expired. Please log in again.',
+                  'Authentication Error'
+                );
                 router.navigate(['/login']);
                 return throwError(() => refreshError);
               })
             );
         }
 
-        // ✅ For login or register, show server's 401 message directly
-        if (req.url.includes('/auth/login') || req.url.includes('/auth/register')) {
+        if (
+          req.url.includes('/auth/login') ||
+          req.url.includes('/auth/register')
+        ) {
           const message =
             error.error?.message || 'Invalid credentials. Please try again.';
           toastr.error(message, 'Unauthorized');
@@ -60,11 +63,13 @@ export const AuthInterceptor: HttpInterceptorFn = (
         }
       }
 
-      // ✅ Handle other errors
       if (error.status >= 500) {
         toastr.error('Server error. Please try again later.', 'Error');
       } else if (error.status === 403) {
-        toastr.warning('You do not have permission for this action.', 'Forbidden');
+        toastr.warning(
+          'You do not have permission for this action.',
+          'Forbidden'
+        );
       } else if (error.error?.message) {
         toastr.error(error.error.message, 'Error');
       } else if (typeof error.error === 'string') {

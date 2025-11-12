@@ -12,8 +12,8 @@ export class UserService {
 
   constructor(private http: HttpClient) {}
 
-  listAllUser(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.api}/users/all`, {
+  listAllUser(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.api}/users/all`, {
       withCredentials: true,
     });
   }

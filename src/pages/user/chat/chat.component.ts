@@ -137,22 +137,16 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
           })
         );
 
-        this.subscriptions.push(
-          this.socketService.userTyping$.subscribe((data: any) => {
-            console.log('⌨️ User typing:', data);
-          })
-        );
+
 
         this.subscriptions.push(
-          this.socketService.messageError$.subscribe((error: any) => {
-            console.error('❌ Message error:', error);
+          this.socketService.messageError$.subscribe((error) => {
             alert('Failed to send message: ' + error.message);
           })
         );
 
         this.subscriptions.push(
-          this.socketService.groupCreated$.subscribe((data: any) => {
-            console.log('✅ Group created successfully:', data);
+          this.socketService.groupCreated$.subscribe((data) => {
             const group = data.group;
 
             this.selectedChat = group;
@@ -887,6 +881,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   isAudioMessage(msg: any): boolean {
+    console.log('msg', msg)
     return (
       msg.type === 'audio' || msg.fileMetadata?.mimeType?.startsWith('audio/')
     );
