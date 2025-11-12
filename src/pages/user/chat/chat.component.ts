@@ -17,6 +17,7 @@ import { EmojiPickerComponent } from '../emoji/emoji-picker.component';
 import { MessageFormatterService } from './service/messageFormat.service';
 import { environment } from '../../../environments/environment';
 import { NotificationModalComponent } from '../../../core/shared/modals/notification-modal.component';
+import { Chat, GroupChat, Member, Message, User } from '../models/user.model';
 
 @Component({
   selector: 'app-chat',
@@ -136,8 +137,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
             this.scrollToBottom();
           })
         );
-
-
 
         this.subscriptions.push(
           this.socketService.messageError$.subscribe((error) => {
@@ -357,7 +356,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
       this.getMemberId(members[0]) === this.currentUser._id;
   }
 
-  isSystemMessage(message: any): boolean {
+  isSystemMessage(message: Message): boolean {
     return message.type === 'system';
   }
 
@@ -374,22 +373,23 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  getMemberId(member: any): string {
+  getMemberId(member: User): string {
+    console.log('member fine', member)
     return typeof member === 'object' ? member._id : member;
   }
 
-  getMemberName(member: any): string {
+  getMemberName(member: User): string {
     return typeof member === 'object' ? member.name : 'Unknown';
   }
 
-  getMemberEmail(member: any): string {
+  getMemberEmail(member: User): string {
     return typeof member === 'object' ? member.email : '';
   }
 
   loadAvailableUsersForGroup() {
     if (!this.selectedChat || !this.selectedChat.isGroup) return;
 
-    const currentMemberIds = (this.selectedChat.members || []).map((m: any) =>
+    const currentMemberIds = (this.selectedChat.members || []).map((m: User) =>
       this.getMemberId(m)
     );
 
@@ -436,7 +436,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     const memberName = this.selectedChat.members.find(
-      (m: any) => this.getMemberId(m) === userId
+      (m: User) => this.getMemberId(m) === userId
     );
     const name = this.getMemberName(memberName);
 
@@ -507,7 +507,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
       });
   }
 
-  selectPrivateChat(user: any) {
+  selectPrivateChat(user: User) {
     if (!this.currentUser) return;
 
     this.isLoading = true;
@@ -539,8 +539,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     this.selectedUsers = [];
 
     this.subscriptions.push(
-      this.socketService.messageError$.subscribe((error: any) => {
-        console.error('❌ Message error:', error);
+      this.socketService.messageError$.subscribe((error) => {
+    
         this.showModal(
           'Message Error',
           'Failed to send message',
@@ -551,7 +551,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     );
   }
 
-  selectExistingChat(chat: any) {
+  selectExistingChat(chat: Chat) {
     this.selectedChat = chat;
     this.messages = [];
     this.showGroupDetails = false;
@@ -563,7 +563,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   loadMessages(chatId: string) {
     this.chatService.getChatMessages(chatId).subscribe({
       next: (res) => {
-        this.messages = res.map((msg: any) => {
+        this.messages = res.map((msg: Message) => {
           const senderIdValue = this.getSenderId(msg);
           return {
             ...msg,
@@ -631,30 +631,32 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (!file) return;
+onFileSelected(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (!file) return;
 
-    const maxSize = 10 * 1024 * 1024;
-    if (file.size > maxSize) {
-      alert('File size exceeds 10MB limit');
-      return;
-    }
-
-    this.selectedFile = file;
-
-    if (file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.filePreview = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    } else {
-      this.filePreview = null;
-    }
-
-    this.uploadFile();
+  const maxSize = 10 * 1024 * 1024; 
+  if (file.size > maxSize) {
+    alert('File size exceeds 10MB limit');
+    return;
   }
+
+  this.selectedFile = file;
+
+  if (file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      this.filePreview = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  } else {
+    this.filePreview = null;
+  }
+
+  this.uploadFile();
+}
+
 
   uploadFile() {
     if (!this.selectedFile || !this.selectedChat) return;
@@ -796,11 +798,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     return this.chatService.formatFileSize(bytes);
   }
 
-  isImageMessage(message: any): boolean {
+  isImageMessage(message: Message): boolean {
     return message.type === 'image';
   }
 
-  isFileMessage(message: any): boolean {
+  isFileMessage(message: Message): boolean {
     return ['file', 'video', 'audio'].includes(message.type);
   }
 
@@ -808,13 +810,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     return this.chatService.getFileUrl(fileName);
   }
 
-  downloadFile(message: any) {
-    if (message.fileMetadata?.url) {
-      window.open(this.environmet.apiUrl + message.fileMetadata.url, '_blank');
-    }
-  }
-
-  // Existing helper methods
   toggleUserSelection(userId: string) {
     const index = this.selectedUsers.indexOf(userId);
     if (index > -1) {
@@ -852,39 +847,36 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     return false;
   }
 
-  getChatDisplayName(chat: any): string {
+  getChatDisplayName(chat: Chat): string {
     if (chat.isGroup) {
       return chat.name;
     }
 
     const otherUser = chat.members?.find(
-      (m: any) => m._id !== this.currentUser._id
+      (m: Member) => m._id !== this.currentUser._id
     );
     return otherUser?.name || 'Unknown User';
   }
 
-  getChatAvatar(chat: any): string {
+  getChatAvatar(chat: GroupChat): string {
+    console.log('getChatAvatar', chat);
     if (chat.isGroup) {
       return chat.name?.charAt(0).toUpperCase() || 'G';
     }
 
     const otherUser = chat.members?.find(
-      (m: any) => m._id !== this.currentUser._id
+      (m: Member) => m._id !== this.currentUser._id
     );
     return otherUser?.name?.charAt(0).toUpperCase() || 'U';
   }
 
-  isVideoMessage(msg: any): boolean {
-    return (
-      msg.type === 'video' || msg.fileMetadata?.mimeType?.startsWith('video/')
-    );
+  isVideoMessage(msg: Message): boolean {
+    return msg.type === 'video';
   }
 
-  isAudioMessage(msg: any): boolean {
-    console.log('msg', msg)
-    return (
-      msg.type === 'audio' || msg.fileMetadata?.mimeType?.startsWith('audio/')
-    );
+  isAudioMessage(msg: Message): boolean {
+    console.log('msg', msg);
+    return msg.type === 'audio';
   }
 
   ngOnDestroy() {

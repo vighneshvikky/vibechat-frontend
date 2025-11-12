@@ -65,7 +65,7 @@ export const AuthInterceptor: HttpInterceptorFn = (
 
       if (error.status >= 500) {
         toastr.error('Server error. Please try again later.', 'Error');
-      } else if (error.status === 403) {
+      } else if (error.status === 403) {  
         toastr.warning(
           'You do not have permission for this action.',
           'Forbidden'

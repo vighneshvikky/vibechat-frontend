@@ -46,7 +46,7 @@
             <div
               class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white font-bold shadow-lg ring-2 ring-white"
             >
-              {{ currentUser.name?.charAt(0).toUpperCase() }}
+              {{ currentUser.name }}
             </div>
             <div
               class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"
@@ -111,77 +111,96 @@
       </div>
 
       <!-- Chats List with Scroll -->
-    <div class="flex-1 overflow-y-auto">
-  <div class="p-2">
-    <div
-      *ngFor="let chat of chats"
-      (click)="selectExistingChat(chat)"
-      class="flex items-center space-x-3 p-3 rounded-xl hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 cursor-pointer transition-all duration-200 mb-1 relative"
-      [class.bg-gradient-to-r]="selectedChat?._id === chat._id"
-      [class.from-purple-100]="selectedChat?._id === chat._id"
-      [class.to-pink-100]="selectedChat?._id === chat._id"
-    >
-      <div class="relative flex-shrink-0">
-        <div
-          class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center text-white font-bold shadow-md"
-        >
-          {{ getChatAvatar(chat) }}
-        </div>
-        <div
-          *ngIf="!chat.isGroup"
-          class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"
-        ></div>
-        <!-- Unread indicator (you can implement unread count logic) -->
-        <div
-          *ngIf="chat.hasUnread && selectedChat?._id !== chat._id"
-          class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full border-2 border-white flex items-center justify-center"
-        >
-          <span class="text-white text-xs font-bold">•</span>
+      <div class="flex-1 overflow-y-auto">
+        <div class="p-2">
+          <div
+            *ngFor="let chat of chats"
+            (click)="selectExistingChat(chat)"
+            class="flex items-center space-x-3 p-3 rounded-xl hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 cursor-pointer transition-all duration-200 mb-1 relative"
+            [class.bg-gradient-to-r]="selectedChat?._id === chat._id"
+            [class.from-purple-100]="selectedChat?._id === chat._id"
+            [class.to-pink-100]="selectedChat?._id === chat._id"
+          >
+            <div class="relative flex-shrink-0">
+              <div
+                class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center text-white font-bold shadow-md"
+              >
+                {{ getChatAvatar(chat) }}
+              </div>
+              <div
+                *ngIf="!chat.isGroup"
+                class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"
+              ></div>
+              <!-- Unread indicator (you can implement unread count logic) -->
+              <div
+                *ngIf="chat.hasUnread && selectedChat?._id !== chat._id"
+                class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full border-2 border-white flex items-center justify-center"
+              >
+                <span class="text-white text-xs font-bold">•</span>
+              </div>
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-1">
+                <p class="text-sm font-semibold text-gray-800 truncate">
+                  {{ getChatDisplayName(chat) }}
+                </p>
+                <span
+                  *ngIf="chat.lastMessage"
+                  class="text-xs text-gray-400 ml-2 flex-shrink-0"
+                >
+                  {{ chat.lastMessage.createdAt | date : "short" }}
+                </span>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <p class="text-xs text-gray-500 truncate flex-1">
+                  <span
+                    *ngIf="
+                      chat.lastMessage?.sender &&
+                      chat.lastMessage.sender._id === currentUser._id
+                    "
+                    class="text-purple-500 font-medium"
+                    >You:
+                  </span>
+                  <span
+                    *ngIf="
+                      chat.lastMessage?.sender &&
+                      chat.lastMessage?.sender._id !== currentUser._id &&
+                      chat.isGroup
+                    "
+                    class="text-gray-600 font-medium"
+                    >{{ chat.lastMessage?.senderId }}:
+                  </span>
+                  {{ getLastMessagePreview(chat) }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty state -->
+          <div
+            *ngIf="chats.length === 0"
+            class="text-center py-8 text-gray-400"
+          >
+            <svg
+              class="w-16 h-16 mx-auto mb-3 opacity-50"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              />
+            </svg>
+            <p class="font-medium">No conversations yet</p>
+            <p class="text-sm mt-1">Start a new chat to get started</p>
+          </div>
         </div>
       </div>
-      
-      <div class="flex-1 min-w-0">
-        <div class="flex items-center justify-between mb-1">
-          <p class="text-sm font-semibold text-gray-800 truncate">
-            {{ getChatDisplayName(chat) }}
-          </p>
-          <span *ngIf="chat.lastMessage" class="text-xs text-gray-400 ml-2 flex-shrink-0">
-            {{ chat.lastMessage.createdAt | date:'short' }}
-          </span>
-        </div>
-        
-        <div class="flex items-center justify-between">
-          <p class="text-xs text-gray-500 truncate flex-1">
-            <span *ngIf="chat.lastMessage?.sender && chat.lastMessage.sender._id === currentUser._id" 
-                  class="text-purple-500 font-medium">You: </span>
-            <span *ngIf="chat.lastMessage?.sender && chat.lastMessage.sender._id !== currentUser._id && chat.isGroup" 
-                  class="text-gray-600 font-medium">{{ chat.lastMessage.sender.name }}: </span>
-            {{ getLastMessagePreview(chat) }}
-          </p>
-          
-          <!-- Message type icon -->
-          <span *ngIf="chat.lastMessage && chat.lastMessage.type !== 'text' && chat.lastMessage.type !== 'system'" 
-                class="ml-2 flex-shrink-0">
-            <span *ngIf="chat.lastMessage.type === 'image'">📷</span>
-            <span *ngIf="chat.lastMessage.type === 'video'">🎥</span>
-            <span *ngIf="chat.lastMessage.type === 'audio'">🎵</span>
-            <span *ngIf="chat.lastMessage.type === 'file'">📎</span>
-          </span>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Empty state -->
-    <div *ngIf="chats.length === 0" class="text-center py-8 text-gray-400">
-      <svg class="w-16 h-16 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-      </svg>
-      <p class="font-medium">No conversations yet</p>
-      <p class="text-sm mt-1">Start a new chat to get started</p>
-    </div>
-  </div>
-</div>
     </div>
 
     <!-- Chat Area -->
@@ -525,17 +544,13 @@
                   {{ msg.sender?.name || "Unknown" }}
                 </div>
 
-             
-
-                                <div
+                <div
                   *ngIf="!msg.self && !selectedChat?.isGroup"
                   class="text-xs font-semibold mb-2"
                   [ngClass]="msg.self ? 'text-purple-100' : 'text-purple-600'"
                 >
                   {{ msg.sender?.name || "Unknown" }}
                 </div>
-
-
 
                 <!-- Text Message -->
                 <div
@@ -549,13 +564,12 @@
                 <!-- Image Message -->
                 <div *ngIf="isImageMessage(msg)" class="space-y-2">
                   <img
-                    [src]="environmet.apiUrl + msg.fileMetadata.url"
-                    [alt]="msg.fileMetadata.originalName"
+                    [src]="environmet.apiUrl + msg.fileMetadata?.url"
+                    [alt]="msg.fileMetadata?.originalName"
                     class="max-w-full h-auto rounded-lg cursor-pointer hover:opacity-90 transition-opacity shadow-md"
-                    (click)="downloadFile(msg)"
                   />
                   <p class="text-xs opacity-75">
-                    {{ msg.fileMetadata.originalName }}
+                    {{ msg.fileMetadata?.originalName }}
                   </p>
                 </div>
 
@@ -566,13 +580,13 @@
                     class="max-w-full h-auto rounded-lg shadow-md"
                   >
                     <source
-                      [src]="environmet.apiUrl + msg.fileMetadata.url"
-                      [type]="msg.fileMetadata.mimeType"
+                      [src]="environmet.apiUrl + msg.fileMetadata?.url"
+                      [type]="msg.fileMetadata?.mimeType"
                     />
                     Your browser does not support the video tag.
                   </video>
                   <p class="text-xs opacity-75">
-                    {{ msg.fileMetadata.originalName }}
+                    {{ msg.fileMetadata?.originalName }}
                   </p>
                 </div>
 
@@ -580,55 +594,20 @@
                 <div *ngIf="isAudioMessage(msg)" class="space-y-2">
                   <audio controls class="w-full max-w-sm">
                     <source
-                      [src]="environmet.apiUrl + msg.fileMetadata.url"
-                      [type]="msg.fileMetadata.mimeType"
+                      [src]="environmet.apiUrl + msg.fileMetadata?.url"
+                      [type]="msg.fileMetadata?.mimeType"
                     />
                     Your browser does not support the audio tag.
                   </audio>
                   <p class="text-xs opacity-75">
-                    {{ msg.fileMetadata.originalName }}
+                    {{ msg.fileMetadata?.originalName }}
                   </p>
                 </div>
 
-                <!-- File Message -->
-                <div
-                  *ngIf="isFileMessage(msg)"
-                  (click)="downloadFile(msg)"
-                  class="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity p-2 rounded-lg"
-                  [ngClass]="
-                    msg.self ? 'hover:bg-white/10' : 'hover:bg-gray-100'
-                  "
-                >
-                  <div class="text-3xl flex-shrink-0">
-                    {{ getFileIcon(msg.fileMetadata.mimeType) }}
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <p class="font-medium truncate">
-                      {{ msg.fileMetadata.originalName }}
-                    </p>
-                    <p class="text-xs opacity-75">
-                      {{ formatFileSize(msg.fileMetadata.size) }}
-                    </p>
-                  </div>
-                  <svg
-                    class="w-5 h-5 flex-shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                    />
-                  </svg>
-                </div>
-
                 <!-- Timestamp -->
-                <div class="text-xs opacity-75 mt-2 text-right">
+                <!-- <div class="text-xs opacity-75 mt-2 text-right">
                   {{ msg.createdAt | date : "short" }}
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -970,7 +949,7 @@
               <div
                 class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center text-white font-bold shadow-md flex-shrink-0"
               >
-                {{ user.name?.charAt(0).toUpperCase() }}
+                {{ user.name}}
               </div>
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-semibold text-gray-800">
@@ -1012,7 +991,6 @@
   </div>
 </div>
 
-
 <app-notification-modal
   [isVisible]="modalVisible"
   [title]="modalTitle"
@@ -1023,5 +1001,6 @@
   [confirmText]="modalConfirmText"
   (confirmed)="onModalConfirm()"
   (cancelled)="onModalCancel()"
-  (closed)="modalVisible = false">
+  (closed)="modalVisible = false"
+>
 </app-notification-modal>
