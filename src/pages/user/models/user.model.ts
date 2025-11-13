@@ -64,15 +64,17 @@ export interface Chat {
   name: string;
   isGroup: boolean;
   members: Member[];
-  lastMessage: LastMessage;
+  lastMessage?: LastMessage;
+  hasUnread?: boolean;
 }
 
 export interface LastMessage {
-  content: string;
-  timestamp: string;
-  type: string;
-  senderId: string;
-  
+  content?: string;
+  timestamp?: string;
+  type?: string;
+  senderId?: string;
+  createdAt?: string;
+  sender?: Member;
 }
 
 export interface GroupChat extends Chat {
@@ -87,3 +89,12 @@ export enum ModalMessage {
   WARNING = 'warning',
   ERROR = 'error',
 }
+
+export interface UploadResponse {
+  success: boolean,
+  messsage: Message
+}
+
+
+
+

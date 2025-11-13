@@ -58,16 +58,16 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 
   showGroupDetails: boolean = false;
   showAddMemberModal: boolean = false;
-  availableUsersForGroup: any[] = [];
+  availableUsersForGroup: User[] = [];
   isGroupAdmin: boolean = false;
 
   messageContent: string = '';
-  currentUser: any;
-  availableUsers: any[] = [];
-  messages: any[] = [];
-  chats: any[] = [];
+  currentUser!: User;
+  availableUsers: User[] = [];
+  messages: Message[] = [];
+  chats: (Chat | GroupChat)[] = [];
 
-  selectedChat: any = null;
+  selectedChat: Chat | null = null;
 
   modalVisible: boolean = false;
   modalTitle: string = '';
@@ -97,7 +97,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
         this.socketService.connect(user._id);
 
         this.subscriptions.push(
-          this.socketService.newMessage$.subscribe((msg: any) => {
+          this.socketService.newMessage$.subscribe((msg) => {
             console.log('📥 NEW MESSAGE EVENT:', msg);
 
             this.moveChatToTop(msg.chatId);
@@ -111,8 +111,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
               };
 
               console.log('✅ Adding message to UI:', newMessage);
-              this.messages.push(newMessage);
 
+              this.messages.push(newMessage);
+              console.log('my messages', this.messages);
               setTimeout(() => {
                 if (this.isNearBottom || newMessage.self) {
                   this.scrollToBottom();
@@ -124,7 +125,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
         );
 
         this.subscriptions.push(
-          this.socketService.privateChatCreated$.subscribe((data: any) => {
+          this.socketService.privateChatCreated$.subscribe((data) => {
             console.log('💬 Private chat created successfully:', data);
             const chat = data.chat;
 
@@ -158,20 +159,20 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
         );
 
         this.subscriptions.push(
-          this.socketService.newGroup$.subscribe((group: any) => {
+          this.socketService.newGroup$.subscribe((group) => {
             console.log('👥 New group notification:', group);
             this.loadChats();
           })
         );
 
         this.subscriptions.push(
-          this.socketService.addedToGroup$.subscribe((group: any) => {
+          this.socketService.addedToGroup$.subscribe((group) => {
             this.loadChats();
           })
         );
 
         this.subscriptions.push(
-          this.socketService.userAddedToGroup$.subscribe((data: any) => {
+          this.socketService.userAddedToGroup$.subscribe((data) => {
             console.log('➕ User added to group event:', data);
             if (this.selectedChat && data.chatId === this.selectedChat._id) {
               this.selectedChat = data.group;
@@ -182,7 +183,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
         );
 
         this.subscriptions.push(
-          this.socketService.userRemovedFromGroup$.subscribe((data: any) => {
+          this.socketService.userRemovedFromGroup$.subscribe((data) => {
             console.log('➖ User removed from group event:', data);
             if (this.selectedChat && data.chatId === this.selectedChat._id) {
               this.selectedChat = data.group;
@@ -193,13 +194,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
         );
 
         this.subscriptions.push(
-          this.socketService.userRemovedFromGroup$.subscribe((data: any) => {
+          this.socketService.userRemovedFromGroup$.subscribe((data) => {
             console.log('➖ User removed from group event:', data);
             if (this.selectedChat && data.chatId === this.selectedChat._id) {
               this.selectedChat = data.group;
               this.checkIfAdmin();
 
-              const memberIds = (data.group.members || []).map((m: any) =>
+              const memberIds = (data.group.members || []).map((m: Member) =>
                 typeof m === 'object' ? m._id : m
               );
 
@@ -212,7 +213,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
         );
 
         this.subscriptions.push(
-          this.socketService.removedFromGroup$.subscribe((data: any) => {
+          this.socketService.removedFromGroup$.subscribe((data) => {
             console.log('🚫 You were removed from group:', data);
 
             if (this.selectedChat && data.chatId === this.selectedChat._id) {
@@ -253,7 +254,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  private getSenderId(msg: any): string {
+  private getSenderId(msg: Message): string {
     if (msg.sender) {
       return typeof msg.sender === 'object' ? msg.sender._id : msg.sender;
     }
@@ -271,21 +272,18 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  getLastMessagePreview(chat: any): string {
+  getLastMessagePreview(chat: Chat): string {
     if (!chat.lastMessage) return 'No messages yet';
 
     const lastMsg = chat.lastMessage;
 
-    console.log('lastMsg', lastMsg);
-
     if (lastMsg.type === 'system') {
-      return lastMsg.content;
+      return lastMsg.content ?? 'System message';
     }
 
     if (lastMsg.type === 'text') {
-      return lastMsg.content.length > 40
-        ? lastMsg.content.substring(0, 40) + '...'
-        : lastMsg.content;
+      const content = lastMsg.content ?? '';
+      return content.length > 40 ? content.substring(0, 40) + '...' : content;
     }
 
     if (lastMsg.type === 'image') return '📷 Image';
@@ -374,7 +372,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   getMemberId(member: User): string {
-    console.log('member fine', member)
+    console.log('member fine', member);
     return typeof member === 'object' ? member._id : member;
   }
 
@@ -438,6 +436,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     const memberName = this.selectedChat.members.find(
       (m: User) => this.getMemberId(m) === userId
     );
+    if (!memberName) return;
     const name = this.getMemberName(memberName);
 
     this.showModal(
@@ -449,7 +448,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
       'Remove',
       () => {
         this.socketService.removeUserFromGroup(
-          this.selectedChat._id,
+          this.selectedChat?._id,
           userId,
           this.currentUser._id
         );
@@ -478,7 +477,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
       'Leave',
       () => {
         this.socketService.removeUserFromGroup(
-          this.selectedChat._id,
+          this.selectedChat?._id,
           this.currentUser._id,
           this.currentUser._id
         );
@@ -540,7 +539,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.subscriptions.push(
       this.socketService.messageError$.subscribe((error) => {
-    
         this.showModal(
           'Message Error',
           'Failed to send message',
@@ -631,32 +629,31 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-onFileSelected(event: Event): void {
-  const input = event.target as HTMLInputElement;
-  const file = input.files?.[0];
-  if (!file) return;
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
 
-  const maxSize = 10 * 1024 * 1024; 
-  if (file.size > maxSize) {
-    alert('File size exceeds 10MB limit');
-    return;
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert('File size exceeds 10MB limit');
+      return;
+    }
+
+    this.selectedFile = file;
+
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        this.filePreview = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      this.filePreview = null;
+    }
+
+    this.uploadFile();
   }
-
-  this.selectedFile = file;
-
-  if (file.type.startsWith('image/')) {
-    const reader = new FileReader();
-    reader.onload = (e: ProgressEvent<FileReader>) => {
-      this.filePreview = e.target?.result as string;
-    };
-    reader.readAsDataURL(file);
-  } else {
-    this.filePreview = null;
-  }
-
-  this.uploadFile();
-}
-
 
   uploadFile() {
     if (!this.selectedFile || !this.selectedChat) return;

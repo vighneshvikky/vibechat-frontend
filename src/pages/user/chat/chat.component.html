@@ -155,23 +155,16 @@
 
               <div class="flex items-center justify-between">
                 <p class="text-xs text-gray-500 truncate flex-1">
+                  <!--  
                   <span
                     *ngIf="
-                      chat.lastMessage?.sender &&
-                      chat.lastMessage.sender._id === currentUser._id
-                    "
-                    class="text-purple-500 font-medium"
-                    >You:
-                  </span>
-                  <span
-                    *ngIf="
-                      chat.lastMessage?.sender &&
-                      chat.lastMessage?.sender._id !== currentUser._id &&
+                      chat.lastMessage?.senderId &&
+                      chat.lastMessage?.senderId !== currentUser._id &&
                       chat.isGroup
                     "
                     class="text-gray-600 font-medium"
                     >{{ chat.lastMessage?.senderId }}:
-                  </span>
+                  </span> -->
                   {{ getLastMessagePreview(chat) }}
                 </p>
               </div>
@@ -541,7 +534,7 @@
                   class="text-xs font-semibold mb-2"
                   [ngClass]="msg.self ? 'text-purple-100' : 'text-purple-600'"
                 >
-                  {{ msg.sender?.name || "Unknown" }}
+                  {{ msg.sender.name || "Unknown" }}
                 </div>
 
                 <div
@@ -549,7 +542,7 @@
                   class="text-xs font-semibold mb-2"
                   [ngClass]="msg.self ? 'text-purple-100' : 'text-purple-600'"
                 >
-                  {{ msg.sender?.name || "Unknown" }}
+                  {{ msg.sender.name || "Unknown" }}
                 </div>
 
                 <!-- Text Message -->
@@ -949,7 +942,7 @@
               <div
                 class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center text-white font-bold shadow-md flex-shrink-0"
               >
-                {{ user.name}}
+                {{ user.name }}
               </div>
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-semibold text-gray-800">

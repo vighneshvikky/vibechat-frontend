@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import {  RoomJoinedData, UserJoinedData, MessageSentData, MessageError, GroupChat, UserAddedToGroup, UserRemovedFromGroup, PrivateChat } from '../../models/socket-events.model';
+import { Message } from '../../models/user.model';
 
 export interface FileMetadata {
   originalName: string;
@@ -20,21 +22,21 @@ export class SocketService {
   private currentUserId: string = '';
 
 
-  private newMessageSubject = new Subject<any>();
-  private roomJoinedSubject = new Subject<any>();
-  private userJoinedSubject = new Subject<any>();
-  private messageSentSubject = new Subject<any>();
-  private messageErrorSubject = new Subject<any>();
+private newMessageSubject = new Subject<Message>();
+private roomJoinedSubject = new Subject<RoomJoinedData>();
+private userJoinedSubject = new Subject<UserJoinedData>();
+private messageSentSubject = new Subject<MessageSentData>();
+private messageErrorSubject = new Subject<MessageError>();
 
 
-  private newGroupSubject = new Subject<any>();
-  private groupCreatedSubject = new Subject<any>();
-  private addedToGroupSubject = new Subject<any>();
-  private userAddedToGroupSubject = new Subject<any>();
-  private userRemovedFromGroupSubject = new Subject<any>();
+ private newGroupSubject = new Subject<GroupChat>();
+private groupCreatedSubject = new Subject<GroupChat>();
+private addedToGroupSubject = new Subject<GroupChat>();
+private userAddedToGroupSubject = new Subject<UserAddedToGroup>();
+private userRemovedFromGroupSubject = new Subject<UserRemovedFromGroup>();
+private removedFromGroupSubject = new Subject<UserRemovedFromGroup>();
 
-
-  private privateChatCreatedSubject = new Subject<any>();
+private privateChatCreatedSubject = new Subject<PrivateChat>();
 
   public newMessage$ = this.newMessageSubject.asObservable();
   public roomJoined$ = this.roomJoinedSubject.asObservable();
@@ -42,7 +44,7 @@ export class SocketService {
   public messageSent$ = this.messageSentSubject.asObservable();
   public messageError$ = this.messageErrorSubject.asObservable();
 
-    private removedFromGroupSubject = new Subject<any>();
+   
   
 
   public removedFromGroup$ = this.removedFromGroupSubject.asObservable();
@@ -239,7 +241,7 @@ export class SocketService {
     this.socket.emit('addUserToGroup', { chatId, userId, addedBy });
   }
 
-  removeUserFromGroup(chatId: string, userId: string, removedBy: string) {
+  removeUserFromGroup(chatId: string | undefined, userId: string, removedBy: string) {
     if (!this.socket) return;
 
     this.socket.emit('removeUserFromGroup', { chatId, userId, removedBy });
