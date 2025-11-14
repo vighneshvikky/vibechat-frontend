@@ -1,9 +1,10 @@
-// src/app/services/chat.service.ts
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { Chat, Message, UploadResponse } from '../../models/user.model';
+import { API_ROUTES } from '../../../../app/app.routes.constant';
 
 export interface CreatePrivateChatDto {
   userId: string;
@@ -20,14 +21,15 @@ export interface CreateGroupChatDto {
   providedIn: 'root',
 })
 export class ChatService {
-  private apiUrl = `${environment.apiUrl}/chats`;
+  private apiUrl = `${environment.apiUrl}${API_ROUTES.CHAT.BASE}`;
+  
 
   constructor(private http: HttpClient) {}
 
-  // Create private chat
+
   createPrivateChat(userId: string, participantId: string): Observable<Chat> {
     return this.http.post<Chat>(
-      `${this.apiUrl}/private`,
+      `${this.apiUrl}${API_ROUTES.CHAT.PRIVATE}`,
       {
         userId,
         participantId,
@@ -36,15 +38,15 @@ export class ChatService {
     );
   }
 
-  // Create group chat
+
   createGroupChat(
     name: string,
     members: string[],
     userId: string
   ): Observable<Chat> {
-    console.log('hai from creating group');
+   
     return this.http.post<Chat>(
-      `${this.apiUrl}/group`,
+      `${this.apiUrl}${API_ROUTES.CHAT.GROUP}`,
       {
         name,
         members,
@@ -54,7 +56,7 @@ export class ChatService {
     );
   }
 
-  // Get all chats for user
+
   getUserChats(userId: string, search: string): Observable<Chat[]> {
     let url = `${this.apiUrl}?userId=${userId}`;
     if (search) {
@@ -66,31 +68,31 @@ export class ChatService {
   getChatMessages(chatId: string): Observable<Message[]> {
     console.log('loading chate ee message');
     return this.http.get<Message[]>(
-      `${this.apiUrl}/getChatMessages/${chatId}`,
+      `${this.apiUrl}${API_ROUTES.CHAT.GET_MESSAGES(chatId)}`,
       { withCredentials: true }
     );
   }
 
-  // Get single chat
+
   getChat(chatId: string): Observable<Chat> {
-    return this.http.get<Chat>(`${this.apiUrl}/${chatId}`, {
+    return this.http.get<Chat>(`${this.apiUrl}${API_ROUTES.CHAT.GET_CHAT(chatId)}`, {
       withCredentials: true,
     });
   }
 
-  // Join group chat
+ 
   joinChat(chatId: string, userId: string): Observable<Chat> {
     return this.http.post<Chat>(
-      `${this.apiUrl}/${chatId}/join`,
+      `${this.apiUrl}${API_ROUTES.CHAT.JOIN(chatId)}`,
       { userId },
       { withCredentials: true }
     );
   }
 
-  // Leave group chat
+ 
   leaveChat(chatId: string, userId: string): Observable<Chat> {
     return this.http.post<Chat>(
-      `${this.apiUrl}/${chatId}/leave`,
+      `${this.apiUrl}${API_ROUTES.CHAT.LEAVE(chatId)}`,
       { userId },
       { withCredentials: true }
     );
@@ -112,7 +114,7 @@ export class ChatService {
   }
 
   getFileUrl(fileName: string): string {
-    return `${environment.apiUrl}/uploads/chat-files/${fileName}`;
+    return `${environment.apiUrl}${API_ROUTES.CHAT.UPLOAD}/chat-files/${fileName}`;
   }
 
   isImageFile(mimeType: string): boolean {

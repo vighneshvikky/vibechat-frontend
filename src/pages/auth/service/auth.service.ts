@@ -7,35 +7,34 @@ import {
   LoginRequest,
   AuthApiResponse,
 } from '../signup/inteface/signup.interface';
+import { API_ROUTES } from '../../../app/app.routes.constant';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private api = environment.apiUrl;
+  private authApi = environment.apiUrl + API_ROUTES.AUTH.BASE;
 
   constructor(private http: HttpClient) {}
 
   register(userData: User): Observable<AuthApiResponse> {
-    console.log('signup data from frontend', userData);
     const data = this.http.post<AuthApiResponse>(
-      `${this.api}/auth/register`,
+      `${this.authApi}${API_ROUTES.AUTH.REGISTER}`,
       userData
     );
-    console.log('signup backend data', data);
+  
     return data;
   }
 
   login(userData: LoginRequest): Observable<AuthApiResponse> {
-    console.log('userData', userData);
     const data = this.http.post<AuthApiResponse>(
-      `${this.api}/auth/login`,
+      `${this.authApi}${API_ROUTES.AUTH.LOGIN}`,
       userData,
       {
         withCredentials: true,
       }
     );
-    console.log('login data from backend', data);
+
     return data;
   }
 }
