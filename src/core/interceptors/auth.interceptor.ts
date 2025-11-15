@@ -11,6 +11,8 @@ import { catchError, switchMap, throwError, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { ToastrService } from 'ngx-toastr';
+import { ERROR_MESSAGES } from '../constants/error.constants';
+import { API_ROUTES } from '../../app/app.routes.constant';
 
 export const AuthInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
@@ -35,18 +37,24 @@ export const AuthInterceptor: HttpInterceptorFn = (
           console.warn('🔄 Access token expired, trying refresh...');
 
           return http
-            .get(`${environment.apiUrl}/auth/refresh`, {
-              withCredentials: true,
-            })
+            .get(
+              `${environment.apiUrl}${API_ROUTES.AUTH.BASE}${API_ROUTES.AUTH.REFRESH}`,
+              {
+                withCredentials: true,
+              }
+            )
             .pipe(
               switchMap(() => next(req.clone({ withCredentials: true }))),
+
               catchError((refreshError: HttpErrorResponse) => {
                 console.error('❌ Refresh failed:', refreshError);
+
                 toastr.error(
-                  'Session expired. Please log in again.',
+                  ERROR_MESSAGES.SESSION_EXPIRED,
                   'Authentication Error'
                 );
-                router.navigate(['/login']);
+
+                router.navigate(['/']);
                 return throwError(() => refreshError);
               })
             );
@@ -56,26 +64,23 @@ export const AuthInterceptor: HttpInterceptorFn = (
           req.url.includes('/auth/login') ||
           req.url.includes('/auth/register')
         ) {
-          const message =
-            error.error?.message || 'Invalid credentials. Please try again.';
+          const message = error.error?.message || ERROR_MESSAGES.UNAUTHORIZED;
+
           toastr.error(message, 'Unauthorized');
           return throwError(() => error);
         }
       }
 
       if (error.status >= 500) {
-        toastr.error('Server error. Please try again later.', 'Error');
-      } else if (error.status === 403) {  
-        toastr.warning(
-          'You do not have permission for this action.',
-          'Forbidden'
-        );
+        toastr.error(ERROR_MESSAGES.SERVER_ERROR, 'Error');
+      } else if (error.status === 403) {
+        toastr.warning(ERROR_MESSAGES.FORBIDDEN, 'Forbidden');
       } else if (error.error?.message) {
         toastr.error(error.error.message, 'Error');
       } else if (typeof error.error === 'string') {
         toastr.error(error.error, 'Error');
       } else {
-        toastr.error('An unexpected error occurred.', 'Error');
+        toastr.error(ERROR_MESSAGES.UNEXPECTED, 'Error');
       }
 
       return throwError(() => error);
