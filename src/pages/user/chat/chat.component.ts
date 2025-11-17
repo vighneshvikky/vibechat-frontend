@@ -43,6 +43,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   isLoading: boolean = false;
   searchTerm: string = '';
   isRemovedFromGroup: boolean = false;
+  validationMessage: string = '';
+
 
   showEmojiPicker: boolean = false;
 
@@ -837,12 +839,50 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  isCreateDisabled(): boolean {
-    if (this.isLoading) return true;
-    if (this.selectedUsers.length === 0) return true;
-    if (this.newChatType === 'group' && !this.groupChatName) return true;
-    return false;
+isCreateDisabled(): boolean {
+  this.validationMessage = ''; // reset
+
+  if (this.isLoading) {
+    this.validationMessage = 'Creating chat, please wait...';
+    return true;
   }
+
+  if (this.selectedUsers.length === 0) {
+    this.validationMessage = 'Select at least one member.';
+    return true;
+  }
+
+  if (this.newChatType === 'group') {
+
+    if (!this.groupChatName || this.groupChatName.trim().length === 0) {
+      this.validationMessage = 'Group name cannot be empty.';
+      return true;
+    }
+
+    const trimmed = this.groupChatName.trim();
+
+    if (trimmed.length < 3) {
+      this.validationMessage = 'Group name must be at least 3 characters.';
+      return true;
+    }
+
+    if (trimmed.length > 10) {
+      this.validationMessage = 'Group name cannot exceed 10 characters.';
+      return true;
+    }
+
+    // Allow only letters, numbers, spaces
+    const validPattern = /^[A-Za-z0-9 ]+$/;
+    if (!validPattern.test(trimmed)) {
+      this.validationMessage =
+        'Group name can only contain letters, numbers, and spaces.';
+      return true;
+    }
+  }
+
+  return false; // everything is valid
+}
+
 
   getChatDisplayName(chat: Chat): string {
     if (chat.isGroup) {
@@ -856,7 +896,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   getChatAvatar(chat: GroupChat): string {
-    console.log('getChatAvatar', chat);
+    
     if (chat.isGroup) {
       return chat.name?.charAt(0).toUpperCase() || 'G';
     }
