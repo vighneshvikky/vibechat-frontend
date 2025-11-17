@@ -871,7 +871,6 @@ isCreateDisabled(): boolean {
       return true;
     }
 
-    // Allow only letters, numbers, spaces
     const validPattern = /^[A-Za-z0-9 ]+$/;
     if (!validPattern.test(trimmed)) {
       this.validationMessage =
@@ -880,7 +879,7 @@ isCreateDisabled(): boolean {
     }
   }
 
-  return false; // everything is valid
+  return false; 
 }
 
 
